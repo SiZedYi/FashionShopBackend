@@ -3,3 +3,10 @@ services:
     image: 'redis:latest'
     ports:
       - '6379'
+  maria-db:
+    image: 'mariadb:latest'
+    environment:
+      MYSQL_ROOT_PASSWORD: anhthang123
+      MARIADB_DATABASE: fashion_shop
+    ports:
+      - '3344:3306'
