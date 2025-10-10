@@ -78,6 +78,7 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // no need session
                 .authorizeHttpRequests(authz -> authz
+                        .requestMatchers("/images/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/product/**").permitAll()
                         .anyRequest().authenticated()
