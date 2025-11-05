@@ -47,6 +47,23 @@ CREATE TABLE categories (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- =====================
+-- SLIDERS
+-- =====================
+CREATE TABLE sliders (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  image_url VARCHAR(500) NOT NULL,
+  subtitle VARCHAR(255) NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  button_text VARCHAR(100),
+  button_link VARCHAR(255),
+  text_align VARCHAR(50),
+  is_active TINYINT(1) NOT NULL DEFAULT 1,
+  display_order INT,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =====================
 -- PRODUCTS
 -- =====================
 CREATE TABLE products (

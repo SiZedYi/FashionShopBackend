@@ -56,6 +56,13 @@ VALUES
 ('Accessories', 'accessories', 'Fashion accessories for men and women', 1, NOW(), NOW()),
 ('Watches', 'watches', 'Stylish watches for every style', 1, NOW(), NOW());
 
+-- SLIDERS
+INSERT INTO sliders (image_url, subtitle, title, button_text, button_link, text_align, is_active, display_order, created_at, updated_at)
+VALUES
+('images/slider/slider-1.jpg', 'PRODUCTS', 'The beauty of nature is hidden in details.', 'Shop Now', '/shop', 'center', 1, 1, NOW(), NOW()),
+('images/slider/slider-2.jpg', 'NEW COLLECTION', 'Discover Your Style With Our Latest Fashion', 'Explore Now', '/shop', 'center', 1, 2, NOW(), NOW()),
+('images/slider/slider-3.jpg', 'SUMMER SALE', 'Up to 50% Off on Selected Items', 'Shop Sale', '/shop?sale=true', 'center', 1, 3, NOW(), NOW());
+
 -- PRODUCTS
 INSERT INTO products (sku, name, description, price, sale_price, stock_quantity, is_active, created_at, updated_at, about_item, discount, rating, brand, color)
 VALUES
