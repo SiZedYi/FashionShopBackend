@@ -12,14 +12,15 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString(exclude = {"orderItems"})
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
 
     @Column(name = "order_number")
     private String orderNumber;
@@ -58,4 +59,3 @@ public class Order {
         pending, paid, shipped, cancelled, refunded
     }
 }
-

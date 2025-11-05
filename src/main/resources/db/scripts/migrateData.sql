@@ -1,9 +1,51 @@
--- USERS
-INSERT INTO users (email, password_hash, full_name, phone, role, is_active, created_at, updated_at)
+-- CUSTOMERS (Public customers - moved from users table)
+INSERT INTO customers (email, password_hash, full_name, phone, is_active, created_at, updated_at)
 VALUES
-('leon.gigsberg@example.com', 'hash1', 'Leon Gigsberg', '1234567890', 'customer', 1, NOW(), NOW()),
-('jane.smith@example.com', 'hash2', 'Jane Smith', '0987654321', 'customer', 1, NOW(), NOW()),
-('admin@example.com', 'adminhash', 'Admin User', '1112223333', 'admin', 1, NOW(), NOW());
+('leon.gigsberg@gmail.com', '$2a$10$FqEzFFY9eXNrGDQoKynTBOHF5L85FmTtMvovEPoWtA7dPEuNbFh7K', 'Leon', '0765461705', 1, '2025-11-03 14:09:14.975764', '2025-11-03 14:09:14.975783'),
+('jane.smith@example.com', 'hash2', 'Jane Smith', '0987654321', 1, NOW(), NOW()),
+('john.doe@example.com', 'hash3', 'John Doe', '1231231234', 1, NOW(), NOW());
+
+-- USERS (Admin/Staff only)
+INSERT INTO users (email, password_hash, full_name, phone, is_active, created_at, updated_at)
+VALUES
+('admin@fashionshop.com', '$2a$10$FqEzFFY9eXNrGDQoKynTBOHF5L85FmTtMvovEPoWtA7dPEuNbFh7K', 'Admin User', '1112223333', 1, NOW(), NOW()),
+('staff@fashionshop.com', '$2a$10$staffHashExample', 'Staff User', '2223334444', 1, NOW(), NOW());
+
+-- ROLES
+INSERT INTO roles (name, description) VALUES
+('admin', 'Administrator role'),
+('staff', 'Staff member role'),
+('manager', 'Manager role');
+
+-- PERMISSIONS
+INSERT INTO permissions (name, description) VALUES
+('READ_PRODUCTS', 'View products'),
+('WRITE_PRODUCTS', 'Add or edit products'),
+('DELETE_PRODUCTS', 'Delete products'),
+('MANAGE_USERS', 'Manage users'),
+('MANAGE_ORDERS', 'Manage orders'),
+('VIEW_REPORTS', 'View reports');
+
+-- ROLE_PERMISSIONS
+INSERT INTO role_permissions (role_id, permission_id) VALUES
+(1, 1), -- admin: READ_PRODUCTS
+(1, 2), -- admin: WRITE_PRODUCTS
+(1, 3), -- admin: DELETE_PRODUCTS
+(1, 4), -- admin: MANAGE_USERS
+(1, 5), -- admin: MANAGE_ORDERS
+(1, 6), -- admin: VIEW_REPORTS
+(2, 1), -- staff: READ_PRODUCTS
+(2, 2), -- staff: WRITE_PRODUCTS
+(2, 5), -- staff: MANAGE_ORDERS
+(3, 1), -- manager: READ_PRODUCTS
+(3, 2), -- manager: WRITE_PRODUCTS
+(3, 5), -- manager: MANAGE_ORDERS
+(3, 6); -- manager: VIEW_REPORTS
+
+-- USER_ROLES
+INSERT INTO user_roles (user_id, role_id) VALUES
+(1, 1), -- admin@fashionshop.com: admin
+(2, 2); -- staff@fashionshop.com: staff
 
 -- CATEGORIES
 INSERT INTO categories (name, slug, description, is_active, created_at, updated_at)
@@ -58,4 +100,3 @@ INSERT INTO reviews (product_id, content, rating, author, image, review_date) VA
 (8, 'Skirt is cute and fits well.', 4.5, 'Hannah Lee', '/images/people/hannah.jpg', NOW()),
 (9, 'Nice shirt for work, good material.', 4.3, 'Ian Curtis', '/images/people/ian.jpg', NOW()),
 (10, 'Jacket is stylish and warm.', 4.7, 'Julia Roberts', '/images/people/julia.jpg', NOW());
-

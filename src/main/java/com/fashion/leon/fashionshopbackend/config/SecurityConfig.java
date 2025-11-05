@@ -16,6 +16,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -45,12 +47,27 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> userRepository.findByEmailAndIsActiveTrue(username)
-                .map(user -> org.springframework.security.core.userdetails.User.builder()
-                        .username(user.getEmail())
-                        .password(user.getPasswordHash())
-                        .authorities("ROLE_" + user.getRole().name().toUpperCase())
-                        .build())
+        return username -> userRepository.findByEmailAndIsActiveTrueFetchRoles(username)
+                .map(user -> {
+                    // Map roles to authorities
+                    var authorities = new ArrayList<GrantedAuthority>();
+                    if (user.getRoles() != null) {
+                        user.getRoles().forEach(role -> {
+                            authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName().toUpperCase()));
+                            // Optionally add permissions as authorities
+                            if (role.getPermissions() != null) {
+                                role.getPermissions().forEach(permission ->
+                                    authorities.add(new SimpleGrantedAuthority(permission.getName()))
+                                );
+                            }
+                        });
+                    }
+                    return org.springframework.security.core.userdetails.User.builder()
+                            .username(user.getEmail())
+                            .password(user.getPasswordHash())
+                            .authorities(authorities)
+                            .build();
+                })
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
     }
 
@@ -79,7 +96,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // no need session
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/images/**").permitAll()
-                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/admin/login").permitAll()
+                        .requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/test", "/api/auth/test-email").permitAll()
                         .requestMatchers("/api/product/**").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .anyRequest().authenticated()
