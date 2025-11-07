@@ -11,6 +11,6 @@ import java.io.Serializable;
 @Builder
 public class ProductCategoryId implements Serializable {
     private Long productId;
-    private Integer categoryId;
+    private Long categoryId;
 }
 
