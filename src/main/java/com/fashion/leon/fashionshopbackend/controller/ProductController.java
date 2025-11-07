@@ -36,25 +36,45 @@ public class ProductController {
     }
 
     @PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
-    public ResponseEntity<ProductResponse> createProduct(
+    public ResponseEntity<?> createProduct(
             @Valid @ModelAttribute ProductRequest productRequest,
             @RequestPart("images") List<MultipartFile> images) {
-        ProductResponse createdProduct = productService.createProduct(productRequest, images);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
+        try {
+            ProductResponse createdProduct = productService.createProduct(productRequest, images);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse(true, "Product created successfully", createdProduct));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(false, "Product creation failed: " + e.getMessage(), null));
+        }
     }
 
     @PutMapping(value = "/{id}", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
-    public ResponseEntity<ProductResponse> updateProduct(
+    public ResponseEntity<?> updateProduct(
             @PathVariable Long id,
             @Valid @ModelAttribute ProductRequest productRequest,
             @RequestPart(value = "images", required = false) List<MultipartFile> images) {
-        ProductResponse updatedProduct = productService.updateProduct(id, productRequest, images);
-        return ResponseEntity.ok(updatedProduct);
+        try {
+            ProductResponse updatedProduct = productService.updateProduct(id, productRequest, images);
+            return ResponseEntity.ok(new ApiResponse(true, "Product updated successfully", updatedProduct));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(false, "Product update failed: " + e.getMessage(), null));
+        }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
-        productService.deleteProduct(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
+        try {
+            productService.deleteProduct(id);
+            return ResponseEntity.ok(new ApiResponse(true, "Product deleted successfully", null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(false, "Product deletion failed: " + e.getMessage(), null));
+        }
+    }
+// Thêm class ApiResponse để chuẩn hóa phản hồi
+    @lombok.Data
+    @lombok.AllArgsConstructor
+    static class ApiResponse {
+        private boolean success;
+        private String message;
+        private Object data;
     }
 }
