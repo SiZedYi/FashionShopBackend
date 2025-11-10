@@ -221,3 +221,17 @@ CREATE TABLE role_permissions (
 -- =====================
 CREATE INDEX idx_products_name ON products(name);
 CREATE INDEX idx_orders_customer_created ON orders(customer_id, created_at);
+
+-- =====================
+-- NOTIFICATIONS
+-- =====================
+CREATE TABLE IF NOT EXISTS notifications (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  type VARCHAR(64) NOT NULL,
+  title VARCHAR(255) NULL,
+  message TEXT NULL,
+  payload TEXT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE INDEX IF NOT EXISTS idx_notifications_created ON notifications(created_at);

@@ -32,6 +32,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final EmailService emailService;
+    private final NotifyService notifyService;
 
     private UserResponse toUserResponse(User user) {
     Set<String> roleNames = Optional.ofNullable(user.getRoles())
@@ -226,6 +227,22 @@ public class UserService {
 
         User saved = userRepository.save(user);
         emailService.sendWelcomeEmail(saved.getEmail(), saved.getFullName());
+        // Notify management via webhook
+        try {
+            notifyService.notify(
+                    "user_created",
+                    "User mới được tạo",
+                    "User '" + saved.getFullName() + "' (" + saved.getEmail() + ") đã được tạo bởi admin.",
+                    java.util.Map.of(
+                            "id", saved.getId(),
+                            "email", saved.getEmail(),
+                            "fullName", saved.getFullName(),
+                            "roles", saved.getRoles().stream().map(Role::getName).toList()
+                    )
+            );
+        } catch (Exception ex) {
+            log.warn("NotifyService failed for user_created: {}", ex.getMessage());
+        }
         return toUserResponse(saved);
     }
 

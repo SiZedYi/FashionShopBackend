@@ -1,13 +1,11 @@
 package com.fashion.leon.fashionshopbackend.service;
 
-import com.fashion.leon.fashionshopbackend.dto.AuthResponse;
-import com.fashion.leon.fashionshopbackend.dto.LoginRequest;
-import com.fashion.leon.fashionshopbackend.dto.RegisterRequest;
-import com.fashion.leon.fashionshopbackend.dto.UserResponse;
+import com.fashion.leon.fashionshopbackend.dto.*;
 import com.fashion.leon.fashionshopbackend.entity.Customer;
 import com.fashion.leon.fashionshopbackend.exception.EmailAlreadyExistsException;
 import com.fashion.leon.fashionshopbackend.exception.InvalidCredentialsException;
 import com.fashion.leon.fashionshopbackend.repository.CustomerRepository;
+import com.fashion.leon.fashionshopbackend.repository.OrderRepository;
 import com.fashion.leon.fashionshopbackend.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,9 +22,11 @@ import java.util.Collections;
 public class CustomerService {
 
     private final CustomerRepository customerRepository;
+        private final OrderRepository orderRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final EmailService emailService;
+        private final NotifyService notifyService;
 
     @Transactional
     public AuthResponse registerCustomer(RegisterRequest request) {
@@ -68,6 +68,22 @@ public class CustomerService {
 
         // Send welcome email asynchronously
         emailService.sendWelcomeEmail(savedCustomer.getEmail(), savedCustomer.getFullName());
+
+        // Notify management about new customer registration (optional)
+        try {
+            notifyService.notify(
+                    "customer_registered",
+                    "Khách hàng mới đăng ký",
+                    "Customer '" + savedCustomer.getFullName() + "' (" + savedCustomer.getEmail() + ") đã đăng ký.",
+                    java.util.Map.of(
+                            "id", savedCustomer.getId(),
+                            "email", savedCustomer.getEmail(),
+                            "fullName", savedCustomer.getFullName()
+                    )
+            );
+        } catch (Exception ex) {
+            log.warn("NotifyService failed for customer_registered: {}", ex.getMessage());
+        }
 
         return AuthResponse.builder()
                 .token(token)
@@ -135,5 +151,91 @@ public class CustomerService {
                 .createdAt(customer.getCreatedAt())
                 .build();
     }
+
+        @Transactional
+        public void deleteCustomerIfNeverOrdered(String email) {
+                Customer customer = customerRepository.findByEmailAndIsActiveTrue(email)
+                                .orElseThrow(() -> new RuntimeException("Customer not found"));
+
+                long orderCount = orderRepository.countByCustomerIdAndPlacedAtIsNotNull(customer.getId());
+                if (orderCount > 0) {
+                        throw new IllegalStateException("Không thể xóa tài khoản vì đã từng đặt hàng online.");
+                }
+
+                customer.setIsActive(false);
+                customer.setDeletedAt(java.time.LocalDateTime.now());
+                customer.setUpdatedAt(java.time.LocalDateTime.now());
+                customerRepository.save(customer);
+                log.info("Customer {} deleted (soft) due to no order history", email);
+        }
+
+                @Transactional
+                public void deleteCustomerIfNeverOrderedById(Long customerId) {
+                        Customer customer = customerRepository.findById(customerId)
+                                        .orElseThrow(() -> new RuntimeException("Customer not found"));
+                        if (Boolean.FALSE.equals(customer.getIsActive())) {
+                                throw new IllegalStateException("Customer đã bị vô hiệu hóa trước đó");
+                        }
+                        long orderCount = orderRepository.countByCustomerIdAndPlacedAtIsNotNull(customer.getId());
+                        if (orderCount > 0) {
+                                throw new IllegalStateException("Không thể xóa customer vì đã từng đặt hàng online.");
+                        }
+                        customer.setIsActive(false);
+                        customer.setDeletedAt(java.time.LocalDateTime.now());
+                        customer.setUpdatedAt(java.time.LocalDateTime.now());
+                        customerRepository.save(customer);
+                        log.info("Customer id={} deleted (soft) by admin due to no order history", customerId);
+                }
+
+                        @Transactional
+                        public UserResponse updateOwnProfile(String email, CustomerUpdateRequest request) {
+                                Customer customer = customerRepository.findByEmailAndIsActiveTrue(email)
+                                                .orElseThrow(() -> new RuntimeException("Customer not found"));
+                                boolean changed = false;
+                                if (request.getFullName() != null) { customer.setFullName(request.getFullName()); changed = true; }
+                                if (request.getPhone() != null) { customer.setPhone(request.getPhone()); changed = true; }
+                                if (request.getPassword() != null && !request.getPassword().isBlank()) {
+                                        customer.setPasswordHash(passwordEncoder.encode(request.getPassword())); changed = true; }
+                                if (changed) {
+                                        customer.setUpdatedAt(LocalDateTime.now());
+                                        customerRepository.save(customer);
+                                }
+                                return UserResponse.builder()
+                                                .id(customer.getId())
+                                                .email(customer.getEmail())
+                                                .fullName(customer.getFullName())
+                                                .phone(customer.getPhone())
+                                                .roles(java.util.Collections.emptySet())
+                                                .isActive(customer.getIsActive())
+                                                .createdAt(customer.getCreatedAt())
+                                                .build();
+                        }
+
+                        @Transactional
+                        public UserResponse adminUpdateCustomer(Long customerId, CustomerUpdateRequest request) {
+                                Customer customer = customerRepository.findById(customerId)
+                                                .orElseThrow(() -> new RuntimeException("Customer not found"));
+                                if (Boolean.FALSE.equals(customer.getIsActive())) {
+                                        throw new IllegalStateException("Customer đã bị vô hiệu hóa");
+                                }
+                                boolean changed = false;
+                                if (request.getFullName() != null) { customer.setFullName(request.getFullName()); changed = true; }
+                                if (request.getPhone() != null) { customer.setPhone(request.getPhone()); changed = true; }
+                                if (request.getPassword() != null && !request.getPassword().isBlank()) {
+                                        customer.setPasswordHash(passwordEncoder.encode(request.getPassword())); changed = true; }
+                                if (changed) {
+                                        customer.setUpdatedAt(LocalDateTime.now());
+                                        customerRepository.save(customer);
+                                }
+                                return UserResponse.builder()
+                                                .id(customer.getId())
+                                                .email(customer.getEmail())
+                                                .fullName(customer.getFullName())
+                                                .phone(customer.getPhone())
+                                                .roles(java.util.Collections.emptySet())
+                                                .isActive(customer.getIsActive())
+                                                .createdAt(customer.getCreatedAt())
+                                                .build();
+                        }
 }
 

@@ -12,11 +12,11 @@ VALUES
 ('staff@fashionshop.com', '$2a$10$staffHashExample', 'Staff User', '2223334444', 1, NOW(), NOW());
 
 -- ROLES
-INSERT INTO roles (name, description) VALUES
-('superadmin', 'Super Administrator role with all permissions'),
-('admin', 'Administrator role'),
-('staff', 'Staff member role'),
-('manager', 'Manager role');
+# INSERT INTO roles (name, description) VALUES
+# ('superadmin', 'Super Administrator role with all permissions'),
+# ('admin', 'Administrator role'),
+# ('staff', 'Staff member role'),
+# ('manager', 'Manager role');
 
 -- PERMISSIONS
 INSERT INTO permissions (name, description) VALUES
@@ -118,3 +118,15 @@ INSERT INTO reviews (product_id, content, rating, author, image, review_date) VA
 (8, 'Skirt is cute and fits well.', 4.5, 'Hannah Lee', '/images/people/hannah.jpg', NOW()),
 (9, 'Nice shirt for work, good material.', 4.3, 'Ian Curtis', '/images/people/ian.jpg', NOW()),
 (10, 'Jacket is stylish and warm.', 4.7, 'Julia Roberts', '/images/people/julia.jpg', NOW());
+
+-- Ensure notifications table exists (idempotent)
+CREATE TABLE IF NOT EXISTS notifications (
+	id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+	type VARCHAR(64) NOT NULL,
+	title VARCHAR(255) NULL,
+	message TEXT NULL,
+	payload TEXT NULL,
+	created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE INDEX IF NOT EXISTS idx_notifications_created ON notifications(created_at);

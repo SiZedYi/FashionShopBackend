@@ -1,20 +1,19 @@
 package com.fashion.leon.fashionshopbackend.controller;
 
 
-import com.fashion.leon.fashionshopbackend.dto.AuthResponse;
-import com.fashion.leon.fashionshopbackend.dto.AdminCreateUserRequest;
-import com.fashion.leon.fashionshopbackend.dto.AdminUpdateUserRequest;
-import com.fashion.leon.fashionshopbackend.dto.AssignRolesRequest;
-import com.fashion.leon.fashionshopbackend.dto.LoginRequest;
-import com.fashion.leon.fashionshopbackend.dto.UserResponse;
+import com.fashion.leon.fashionshopbackend.dto.*;
+import com.fashion.leon.fashionshopbackend.service.CustomerService;
 import com.fashion.leon.fashionshopbackend.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import com.fashion.leon.fashionshopbackend.dto.PaginatedResponse;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -23,6 +22,7 @@ import com.fashion.leon.fashionshopbackend.dto.PaginatedResponse;
 @CrossOrigin(origins = "*")
 public class AdminAuthController {
     private final UserService userService;
+    private final CustomerService customerService;
     // Admin login endpoint
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> loginAdmin(@Valid @RequestBody LoginRequest request) {
@@ -67,10 +67,13 @@ public class AdminAuthController {
 
     @DeleteMapping("/users/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','SUPERADMIN')")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<Map<String, String>> deleteUser(@PathVariable Long id) {
         log.info("[ADMIN] Delete user id: {}", id);
         userService.deleteUserByAdmin(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(Map.of(
+                "message", "Xóa user thành công",
+                "id", String.valueOf(id)
+        ));
     }
 
     @GetMapping("/users")
@@ -83,5 +86,22 @@ public class AdminAuthController {
         log.info("[ADMIN] List users q={} isActive={} role={} page={} size={}", q, isActive, role, page, size);
         PaginatedResponse<UserResponse> result = userService.listUsers(q, isActive, role, page, size);
         return ResponseEntity.ok(result);
+    }
+
+    // Delete a specific customer by id if they have never placed an order
+    @DeleteMapping("/customers/{customerId}")
+    @PreAuthorize("hasAnyRole('ADMIN','SUPERADMIN')")
+    public ResponseEntity<?> deleteCustomerIfNoOrders(@PathVariable Long customerId) {
+        try {
+            customerService.deleteCustomerIfNeverOrderedById(customerId);
+            return ResponseEntity.ok(Map.of(
+                    "message", "Xóa customer thành công",
+                    "customerId", String.valueOf(customerId)
+            ));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", e.getMessage()));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+        }
     }
 }
