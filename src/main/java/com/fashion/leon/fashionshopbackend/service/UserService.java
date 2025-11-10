@@ -1,25 +1,26 @@
 package com.fashion.leon.fashionshopbackend.service;
 
-import com.fashion.leon.fashionshopbackend.dto.AuthResponse;
-import com.fashion.leon.fashionshopbackend.dto.LoginRequest;
-import com.fashion.leon.fashionshopbackend.dto.RegisterRequest;
-import com.fashion.leon.fashionshopbackend.dto.UserResponse;
+import com.fashion.leon.fashionshopbackend.dto.*;
 import com.fashion.leon.fashionshopbackend.entity.Role;
 import com.fashion.leon.fashionshopbackend.entity.User;
 import com.fashion.leon.fashionshopbackend.exception.EmailAlreadyExistsException;
 import com.fashion.leon.fashionshopbackend.exception.InvalidCredentialsException;
+import com.fashion.leon.fashionshopbackend.exception.ResourceNotFoundException;
 import com.fashion.leon.fashionshopbackend.repository.RoleRepository;
 import com.fashion.leon.fashionshopbackend.repository.UserRepository;
 import com.fashion.leon.fashionshopbackend.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,6 +33,22 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final EmailService emailService;
+
+    private UserResponse toUserResponse(User user) {
+    Set<String> roleNames = Optional.ofNullable(user.getRoles())
+        .orElseGet(Collections::emptySet)
+        .stream().map(Role::getName).collect(Collectors.toSet());
+
+    return UserResponse.builder()
+        .id(user.getId())
+        .email(user.getEmail())
+        .fullName(user.getFullName())
+        .phone(user.getPhone())
+        .roles(roleNames)
+        .isActive(user.getIsActive())
+        .createdAt(user.getCreatedAt())
+        .build();
+    }
 
     @Transactional
     public AuthResponse registerUser(RegisterRequest request) {
@@ -171,5 +188,114 @@ public class UserService {
                 .isActive(user.getIsActive())
                 .createdAt(user.getCreatedAt())
                 .build();
+    }
+
+    // ============ ADMIN FUNCTIONS ============
+    @Transactional
+    public UserResponse createUserByAdmin(AdminCreateUserRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new EmailAlreadyExistsException("Email đã được sử dụng: " + request.getEmail());
+        }
+
+        // roles: default to ["staff"] if not provided or empty
+        Set<String> roleNames = Optional.ofNullable(request.getRoles())
+                .filter(set -> !set.isEmpty())
+                .orElseGet(() -> new HashSet<>(Set.of("staff")));
+
+        List<Role> roles = roleRepository.findByNameIn(
+                roleNames.stream().filter(Objects::nonNull).map(String::toLowerCase).collect(Collectors.toSet())
+        );
+
+        if (roles.size() != roleNames.size()) {
+            // Find which ones are missing
+            Set<String> found = roles.stream().map(Role::getName).collect(Collectors.toSet());
+            Set<String> missing = new HashSet<>(roleNames);
+            missing.removeAll(found);
+            throw new ResourceNotFoundException("Không tìm thấy các role: " + String.join(", ", missing));
+        }
+
+        User user = User.builder()
+                .email(request.getEmail())
+                .passwordHash(passwordEncoder.encode(request.getPassword()))
+                .fullName(request.getFullName())
+                .phone(request.getPhone())
+                .roles(new HashSet<>(roles))
+                .isActive(true)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+        User saved = userRepository.save(user);
+        emailService.sendWelcomeEmail(saved.getEmail(), saved.getFullName());
+        return toUserResponse(saved);
+    }
+
+    @Transactional
+    public UserResponse updateUserByAdmin(Long userId, AdminUpdateUserRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User không tồn tại với id: " + userId));
+
+        if (request.getFullName() != null) user.setFullName(request.getFullName());
+        if (request.getPhone() != null) user.setPhone(request.getPhone());
+        if (request.getIsActive() != null) user.setIsActive(request.getIsActive());
+        if (request.getPassword() != null && !request.getPassword().isBlank()) {
+            user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        }
+        user.setUpdatedAt(LocalDateTime.now());
+        User saved = userRepository.save(user);
+        return toUserResponse(saved);
+    }
+
+    @Transactional
+    public UserResponse assignRolesToUser(Long userId, AssignRolesRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User không tồn tại với id: " + userId));
+
+        Set<String> roleNames = Optional.ofNullable(request.getRoles())
+                .orElseThrow(() -> new IllegalArgumentException("roles must not be null"));
+
+        List<Role> roles = roleRepository.findByNameIn(
+                roleNames.stream().filter(Objects::nonNull).map(String::toLowerCase).collect(Collectors.toSet())
+        );
+
+        if (roles.size() != roleNames.size()) {
+            Set<String> found = roles.stream().map(Role::getName).collect(Collectors.toSet());
+            Set<String> missing = new HashSet<>(roleNames);
+            missing.removeAll(found);
+            throw new ResourceNotFoundException("Không tìm thấy các role: " + String.join(", ", missing));
+        }
+
+        user.setRoles(new HashSet<>(roles));
+        user.setUpdatedAt(LocalDateTime.now());
+        User saved = userRepository.save(user);
+        return toUserResponse(saved);
+    }
+
+    @Transactional
+    public void deleteUserByAdmin(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User không tồn tại với id: " + userId));
+        user.setIsActive(false);
+        user.setDeletedAt(LocalDateTime.now());
+        user.setUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<UserResponse> listUsers(String q, Boolean isActive, String role, int page, int size) {
+        Pageable pageable = PageRequest.of(Math.max(page, 0), Math.min(Math.max(size, 1), 100));
+        Page<User> users = userRepository.searchUsers(
+                normalizeBlank(q), isActive, normalizeBlank(role), pageable
+        );
+        List<UserResponse> content = users.getContent().stream()
+                .map(this::toUserResponse)
+                .toList();
+        return new PageImpl<>(content, pageable, users.getTotalElements());
+    }
+
+    private String normalizeBlank(String s) {
+        if (s == null) return null;
+        String t = s.trim();
+        return t.isEmpty() ? null : t;
     }
 }

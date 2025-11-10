@@ -28,12 +28,13 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import java.io.IOException;
 import java.util.ArrayList;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -47,7 +48,8 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> userRepository.findByEmailAndIsActiveTrueFetchRoles(username)
+        // Fetch user with roles AND permissions to avoid LazyInitializationException when mapping authorities
+        return username -> userRepository.findByEmailAndIsActiveTrueFetchRolesAndPermissions(username)
                 .map(user -> {
                     // Map roles to authorities
                     var authorities = new ArrayList<GrantedAuthority>();
@@ -55,10 +57,15 @@ public class SecurityConfig {
                         user.getRoles().forEach(role -> {
                             authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName().toUpperCase()));
                             // Optionally add permissions as authorities
-                            if (role.getPermissions() != null) {
-                                role.getPermissions().forEach(permission ->
-                                    authorities.add(new SimpleGrantedAuthority(permission.getName()))
-                                );
+                            try {
+                                if (role.getPermissions() != null) {
+                                    role.getPermissions().forEach(permission ->
+                                            authorities.add(new SimpleGrantedAuthority(permission.getName()))
+                                    );
+                                }
+                            } catch (org.hibernate.LazyInitializationException ex) {
+                                // Should not happen due to fetch join; log defensively if it does.
+                                System.err.println("Warning: permissions lazy init failed for role " + role.getName());
                             }
                         });
                     }

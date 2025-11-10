@@ -13,6 +13,7 @@ VALUES
 
 -- ROLES
 INSERT INTO roles (name, description) VALUES
+('superadmin', 'Super Administrator role with all permissions'),
 ('admin', 'Administrator role'),
 ('staff', 'Staff member role'),
 ('manager', 'Manager role');
@@ -24,7 +25,17 @@ INSERT INTO permissions (name, description) VALUES
 ('DELETE_PRODUCTS', 'Delete products'),
 ('MANAGE_USERS', 'Manage users'),
 ('MANAGE_ORDERS', 'Manage orders'),
-('VIEW_REPORTS', 'View reports');
+('VIEW_REPORTS', 'View reports'),
+('MANAGE_CATEGORIES', 'Manage product categories'),
+('MANAGE_SLIDERS', 'Manage homepage sliders'),
+('MANAGE_PRODUCTS', 'Manage all product details'),
+('READ_USERS', 'View users'),
+('WRITE_USERS', 'Add or edit users'),
+('DELETE_USERS', 'Delete users'),
+('READ_ORDERS', 'View orders'),
+('WRITE_ORDERS', 'Add or edit orders'),
+('DELETE_ORDERS', 'Delete orders')
+;
 
 -- ROLE_PERMISSIONS
 INSERT INTO role_permissions (role_id, permission_id) VALUES
