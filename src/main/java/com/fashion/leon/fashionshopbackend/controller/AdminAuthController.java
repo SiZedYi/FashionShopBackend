@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.data.domain.Page;
+import com.fashion.leon.fashionshopbackend.dto.PaginatedResponse;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -75,13 +75,13 @@ public class AdminAuthController {
 
     @GetMapping("/users")
     @PreAuthorize("hasAnyRole('ADMIN','SUPERADMIN')")
-    public ResponseEntity<Page<UserResponse>> listUsers(@RequestParam(required = false) String q,
-                                                        @RequestParam(required = false) Boolean isActive,
-                                                        @RequestParam(required = false) String role,
-                                                        @RequestParam(defaultValue = "0") int page,
-                                                        @RequestParam(defaultValue = "20") int size) {
+    public ResponseEntity<PaginatedResponse<UserResponse>> listUsers(@RequestParam(required = false) String q,
+                                                                     @RequestParam(required = false) Boolean isActive,
+                                                                     @RequestParam(required = false) String role,
+                                                                     @RequestParam(defaultValue = "0") int page,
+                                                                     @RequestParam(defaultValue = "20") int size) {
         log.info("[ADMIN] List users q={} isActive={} role={} page={} size={}", q, isActive, role, page, size);
-        Page<UserResponse> result = userService.listUsers(q, isActive, role, page, size);
+        PaginatedResponse<UserResponse> result = userService.listUsers(q, isActive, role, page, size);
         return ResponseEntity.ok(result);
     }
 }

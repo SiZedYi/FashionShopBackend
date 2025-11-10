@@ -12,7 +12,6 @@ import com.fashion.leon.fashionshopbackend.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -282,7 +281,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Page<UserResponse> listUsers(String q, Boolean isActive, String role, int page, int size) {
+    public com.fashion.leon.fashionshopbackend.dto.PaginatedResponse<UserResponse> listUsers(String q, Boolean isActive, String role, int page, int size) {
         Pageable pageable = PageRequest.of(Math.max(page, 0), Math.min(Math.max(size, 1), 100));
         Page<User> users = userRepository.searchUsers(
                 normalizeBlank(q), isActive, normalizeBlank(role), pageable
@@ -290,7 +289,14 @@ public class UserService {
         List<UserResponse> content = users.getContent().stream()
                 .map(this::toUserResponse)
                 .toList();
-        return new PageImpl<>(content, pageable, users.getTotalElements());
+    return new com.fashion.leon.fashionshopbackend.dto.PaginatedResponse<>(
+        users.getNumber(),
+        users.getSize(),
+        users.getTotalElements(),
+        users.getTotalPages(),
+        users.isLast(),
+        content
+    );
     }
 
     private String normalizeBlank(String s) {
