@@ -24,7 +24,7 @@ public class NotificationController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('STAFF','ADMIN','SUPERADMIN')")
-    public ResponseEntity<Page<NotificationResponse>> list(@RequestParam(defaultValue = "0") int page,
+    public ResponseEntity<Page<NotificationResponse>> list(@RequestParam(defaultValue = "1") int page,
                                                            @RequestParam(defaultValue = "20") int size) {
         Pageable pageable = PageRequest.of(Math.max(0, page), Math.min(Math.max(1, size), 100));
         List<Notification> list = notificationRepository.findByOrderByIdDesc(pageable);

@@ -104,10 +104,11 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // no need session
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/images/**").permitAll()
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/api/admin/login").permitAll()
                         .requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/test", "/api/auth/test-email").permitAll()
                         .requestMatchers("/api/product/**").permitAll()
-                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        .requestMatchers("/api/sliders/active").permitAll()
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider())

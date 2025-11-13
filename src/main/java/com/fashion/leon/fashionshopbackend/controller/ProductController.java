@@ -24,9 +24,9 @@ public class ProductController {
 
     @GetMapping
     public PaginatedResponse<ProductResponse> getAllProducts(
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(Math.max(0, page - 1), size);
         return productService.getAllProducts(pageable);
     }
 

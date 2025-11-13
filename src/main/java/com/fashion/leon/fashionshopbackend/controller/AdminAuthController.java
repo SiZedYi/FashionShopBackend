@@ -81,7 +81,7 @@ public class AdminAuthController {
     public ResponseEntity<PaginatedResponse<UserResponse>> listUsers(@RequestParam(required = false) String q,
                                                                      @RequestParam(required = false) Boolean isActive,
                                                                      @RequestParam(required = false) String role,
-                                                                     @RequestParam(defaultValue = "0") int page,
+                                                                     @RequestParam(defaultValue = "1") int page,
                                                                      @RequestParam(defaultValue = "20") int size) {
         log.info("[ADMIN] List users q={} isActive={} role={} page={} size={}", q, isActive, role, page, size);
         PaginatedResponse<UserResponse> result = userService.listUsers(q, isActive, role, page, size);

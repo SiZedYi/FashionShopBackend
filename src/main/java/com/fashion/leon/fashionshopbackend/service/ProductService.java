@@ -39,8 +39,8 @@ public class ProductService {
         List<ProductResponse> data = productPage.getContent().stream()
                 .map(productMapper::toProductResponse)
                 .collect(Collectors.toList());
-        return new PaginatedResponse<>(
-                productPage.getNumber(),
+    return new PaginatedResponse<>(
+        productPage.getNumber() + 1,
                 productPage.getSize(),
                 productPage.getTotalElements(),
                 productPage.getTotalPages(),

@@ -299,7 +299,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public com.fashion.leon.fashionshopbackend.dto.PaginatedResponse<UserResponse> listUsers(String q, Boolean isActive, String role, int page, int size) {
-        Pageable pageable = PageRequest.of(Math.max(page, 0), Math.min(Math.max(size, 1), 100));
+    Pageable pageable = PageRequest.of(Math.max(page - 1, 0), Math.min(Math.max(size, 1), 100));
         Page<User> users = userRepository.searchUsers(
                 normalizeBlank(q), isActive, normalizeBlank(role), pageable
         );
@@ -307,7 +307,7 @@ public class UserService {
                 .map(this::toUserResponse)
                 .toList();
     return new com.fashion.leon.fashionshopbackend.dto.PaginatedResponse<>(
-        users.getNumber(),
+        users.getNumber() + 1,
         users.getSize(),
         users.getTotalElements(),
         users.getTotalPages(),
