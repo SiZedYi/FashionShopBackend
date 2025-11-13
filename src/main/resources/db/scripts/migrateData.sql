@@ -67,6 +67,9 @@ VALUES
 ('Accessories', 'accessories', 'Fashion accessories for men and women', 1, NOW(), NOW()),
 ('Watches', 'watches', 'Stylish watches for every style', 1, NOW(), NOW());
 
+-- Ensure categories.images column exists (idempotent)
+ALTER TABLE categories ADD COLUMN IF NOT EXISTS images VARCHAR(1000) NULL;
+
 -- SLIDERS
 INSERT INTO sliders (image_url, subtitle, title, button_text, button_link, text_align, is_active, display_order, created_at, updated_at)
 VALUES

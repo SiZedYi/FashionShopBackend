@@ -19,6 +19,9 @@ public class Category {
     private String slug;
     private String description;
 
+    @Column(name = "images")
+    private String images;
+
     @Column(name = "is_active")
     private Boolean isActive;
 
