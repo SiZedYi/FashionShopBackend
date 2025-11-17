@@ -59,13 +59,13 @@ INSERT INTO user_roles (user_id, role_id) VALUES
 (2, 2); -- staff@fashionshop.com: staff
 
 -- CATEGORIES
-INSERT INTO categories (name, slug, description, is_active, created_at, updated_at)
+INSERT INTO categories (name, slug, description, is_active, images, created_at, updated_at)
 VALUES
-('Men''s Clothing', 'mens-clothing', 'Trendy and classic men''s fashion', 1, NOW(), NOW()),
-('Women''s Clothing', 'womens-clothing', 'Elegant and modern women''s fashion', 1, NOW(), NOW()),
-('Shoes', 'shoes', 'Footwear for all occasions', 1, NOW(), NOW()),
-('Accessories', 'accessories', 'Fashion accessories for men and women', 1, NOW(), NOW()),
-('Watches', 'watches', 'Stylish watches for every style', 1, NOW(), NOW());
+('Men''s Clothing', 'mens-clothing', 'Trendy and classic men''s fashion', 1, '/images/category/category-1.jpg', NOW(), NOW()),
+('Women''s Clothing', 'womens-clothing', 'Elegant and modern women''s fashion', 1,'/images/category/category-2.jpg', NOW(), NOW()),
+('Shoes', 'shoes', 'Footwear for all occasions', 1,'/images/category/category-3.jpg', NOW(), NOW()),
+('Accessories', 'accessories', 'Fashion accessories for men and women', 1, '/images/category/category-1.jpg', NOW(), NOW()),
+('Watches', 'watches', 'Stylish watches for every style', 1, '/images/category/category-1.jpg', NOW(), NOW());
 
 -- Ensure categories.images column exists (idempotent)
 ALTER TABLE categories ADD COLUMN IF NOT EXISTS images VARCHAR(1000) NULL;
