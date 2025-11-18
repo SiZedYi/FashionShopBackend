@@ -11,7 +11,10 @@ import java.util.List;
 public class ProductResponse {
     private Long id;
     private String name;
+    // Backward-compat: first category name (if any)
     private String category;
+    // New: list of category names
+    private List<String> categories;
     private String description;
     private String aboutItem;
     private BigDecimal price;
