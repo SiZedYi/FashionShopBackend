@@ -5,10 +5,12 @@ import lombok.*;
 
 @Entity
 @Table(name = "product_categories")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString(of = {"id"})
 public class ProductCategory {
     @EmbeddedId
     private ProductCategoryId id;
