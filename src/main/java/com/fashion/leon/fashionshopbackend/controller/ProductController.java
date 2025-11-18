@@ -6,6 +6,7 @@ import com.fashion.leon.fashionshopbackend.dto.ProductResponse;
 import com.fashion.leon.fashionshopbackend.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/product")
 @RequiredArgsConstructor
@@ -37,9 +39,10 @@ public class ProductController {
 
     @PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<?> createProduct(
-            @Valid @ModelAttribute ProductRequest productRequest,
-            @RequestPart("images") List<MultipartFile> images) {
+        @Valid @RequestPart("product") ProductRequest productRequest,
+        @RequestPart("images") List<MultipartFile> images) {
         try {
+
             ProductResponse createdProduct = productService.createProduct(productRequest, images);
             return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse(true, "Product created successfully", createdProduct));
         } catch (Exception e) {
@@ -50,9 +53,10 @@ public class ProductController {
     @PutMapping(value = "/{id}", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<?> updateProduct(
             @PathVariable Long id,
-            @Valid @ModelAttribute ProductRequest productRequest,
+            @Valid @RequestPart("product") ProductRequest productRequest,
             @RequestPart(value = "images", required = false) List<MultipartFile> images) {
         try {
+            log.info("Updating product with id:"  + id);
             ProductResponse updatedProduct = productService.updateProduct(id, productRequest, images);
             return ResponseEntity.ok(new ApiResponse(true, "Product updated successfully", updatedProduct));
         } catch (Exception e) {
