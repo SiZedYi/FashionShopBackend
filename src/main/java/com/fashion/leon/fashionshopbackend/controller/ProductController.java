@@ -27,9 +27,10 @@ public class ProductController {
     @GetMapping
     public PaginatedResponse<ProductResponse> getAllProducts(
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "") String category) {
         Pageable pageable = PageRequest.of(Math.max(0, page - 1), size);
-        return productService.getAllProducts(pageable);
+        return productService.getAllProducts(pageable, category);
     }
 
     @GetMapping("/{id}")

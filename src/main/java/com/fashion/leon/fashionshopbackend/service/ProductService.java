@@ -36,11 +36,16 @@ public class ProductService {
     private final FileStorageService fileStorageService;
     private final ProductMapper productMapper;
 
-    public PaginatedResponse<ProductResponse> getAllProducts(Pageable pageable) {
+    public PaginatedResponse<ProductResponse> getAllProducts(Pageable pageable, String category) {
         Page<Product> productPage = productRepository.findAll(pageable);
         List<ProductResponse> data = productPage.getContent().stream()
                 .map(productMapper::toProductResponse)
                 .collect(Collectors.toList());
+        if (category != null && !category.isEmpty()) {
+            data = data.stream()
+                    .filter(p -> p.getCategories() != null && p.getCategories().contains(category))
+                    .collect(Collectors.toList());
+        }
     return new PaginatedResponse<>(
         productPage.getNumber() + 1,
                 productPage.getSize(),
