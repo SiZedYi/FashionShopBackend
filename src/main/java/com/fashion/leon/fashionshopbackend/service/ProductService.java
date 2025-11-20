@@ -36,24 +36,25 @@ public class ProductService {
     private final FileStorageService fileStorageService;
     private final ProductMapper productMapper;
 
-    public PaginatedResponse<ProductResponse> getAllProducts(Pageable pageable, String category) {
-        Page<Product> productPage = productRepository.findAll(pageable);
-        List<ProductResponse> data = productPage.getContent().stream()
-                .map(productMapper::toProductResponse)
-                .collect(Collectors.toList());
-        if (category != null && !category.isEmpty()) {
-            data = data.stream()
-                    .filter(p -> p.getCategories() != null && p.getCategories().contains(category))
-                    .collect(Collectors.toList());
-        }
+    public PaginatedResponse<ProductResponse> getAllProducts(Pageable pageable,
+                                 String category,
+                                 String color,
+                                 java.math.BigDecimal minPrice,
+                                 java.math.BigDecimal maxPrice) {
+    String catFilter = (category != null && !category.isBlank()) ? category : null;
+    String colorFilter = (color != null && !color.isBlank()) ? color : null;
+    Page<Product> productPage = productRepository.searchProducts(catFilter, colorFilter, minPrice, maxPrice, pageable);
+    List<ProductResponse> data = productPage.getContent().stream()
+        .map(productMapper::toProductResponse)
+        .collect(Collectors.toList());
     return new PaginatedResponse<>(
         productPage.getNumber() + 1,
-                productPage.getSize(),
-                productPage.getTotalElements(),
-                productPage.getTotalPages(),
-                productPage.isLast(),
-                data
-        );
+        productPage.getSize(),
+        productPage.getTotalElements(),
+        productPage.getTotalPages(),
+        productPage.isLast(),
+        data
+    );
     }
 
     public ProductResponse getProductDetail(Long id) {

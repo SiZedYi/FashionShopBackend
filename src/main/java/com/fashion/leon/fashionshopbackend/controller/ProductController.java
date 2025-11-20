@@ -28,9 +28,12 @@ public class ProductController {
     public PaginatedResponse<ProductResponse> getAllProducts(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "") String category) {
+            @RequestParam(defaultValue = "") String category,
+            @RequestParam(required = false) String color,
+            @RequestParam(required = false) java.math.BigDecimal minPrice,
+            @RequestParam(required = false) java.math.BigDecimal maxPrice) {
         Pageable pageable = PageRequest.of(Math.max(0, page - 1), size);
-        return productService.getAllProducts(pageable, category);
+        return productService.getAllProducts(pageable, category, color, minPrice, maxPrice);
     }
 
     @GetMapping("/{id}")
