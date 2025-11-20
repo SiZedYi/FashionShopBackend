@@ -93,7 +93,7 @@ public class CustomerService {
                 .build();
     }
 
-    public AuthResponse loginCustomer(LoginRequest request) {
+        public AuthResponse loginCustomer(LoginRequest request) {
         log.info("Attempting to login customer with email: {}", request.getEmail());
 
         // Find customer by email
@@ -122,6 +122,20 @@ public class CustomerService {
                 .roles(Collections.emptySet())
                 .isActive(customer.getIsActive())
                 .createdAt(customer.getCreatedAt())
+                .addresses(customer.getAddresses() != null ? customer.getAddresses().stream().map(a -> AddressResponse.builder()
+                        .id(a.getId())
+                        .fullName(a.getFullName())
+                        .phone(a.getPhone())
+                        .line1(a.getLine1())
+                        .line2(a.getLine2())
+                        .city(a.getCity())
+                        .state(a.getState())
+                        .postalCode(a.getPostalCode())
+                        .country(a.getCountry())
+                        .isDefault(a.getIsDefault())
+                        .createdAt(a.getCreatedAt())
+                        .updatedAt(a.getUpdatedAt())
+                        .build()).toList() : java.util.Collections.emptyList())
                 .build();
 
         // Generate JWT token
@@ -135,11 +149,28 @@ public class CustomerService {
                 .build();
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public UserResponse getCustomerProfile(String email) {
-        Customer customer = customerRepository.findByEmailAndIsActiveTrue(email)
+        Customer customer = customerRepository.findByEmailAndIsActiveTrueFetchAddresses(email)
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
 
         log.info("Fetching profile for customer with email: {}", customer.getEmail());
+
+        java.util.List<AddressResponse> addressResponses = customer.getAddresses() != null ?
+                customer.getAddresses().stream().map(a -> AddressResponse.builder()
+                        .id(a.getId())
+                        .fullName(a.getFullName())
+                        .phone(a.getPhone())
+                        .line1(a.getLine1())
+                        .line2(a.getLine2())
+                        .city(a.getCity())
+                        .state(a.getState())
+                        .postalCode(a.getPostalCode())
+                        .country(a.getCountry())
+                        .isDefault(a.getIsDefault())
+                        .createdAt(a.getCreatedAt())
+                        .updatedAt(a.getUpdatedAt())
+                        .build()).toList() : java.util.Collections.emptyList();
 
         return UserResponse.builder()
                 .id(customer.getId())
@@ -149,6 +180,7 @@ public class CustomerService {
                 .roles(Collections.emptySet())
                 .isActive(customer.getIsActive())
                 .createdAt(customer.getCreatedAt())
+                .addresses(addressResponses)
                 .build();
     }
 
@@ -201,14 +233,28 @@ public class CustomerService {
                                         customerRepository.save(customer);
                                 }
                                 return UserResponse.builder()
-                                                .id(customer.getId())
-                                                .email(customer.getEmail())
-                                                .fullName(customer.getFullName())
-                                                .phone(customer.getPhone())
-                                                .roles(java.util.Collections.emptySet())
-                                                .isActive(customer.getIsActive())
-                                                .createdAt(customer.getCreatedAt())
-                                                .build();
+                                                        .id(customer.getId())
+                                                        .email(customer.getEmail())
+                                                        .fullName(customer.getFullName())
+                                                        .phone(customer.getPhone())
+                                                        .roles(java.util.Collections.emptySet())
+                                                        .isActive(customer.getIsActive())
+                                                        .createdAt(customer.getCreatedAt())
+                                                        .addresses(customer.getAddresses() != null ? customer.getAddresses().stream().map(a -> AddressResponse.builder()
+                                                                .id(a.getId())
+                                                                .fullName(a.getFullName())
+                                                                .phone(a.getPhone())
+                                                                .line1(a.getLine1())
+                                                                .line2(a.getLine2())
+                                                                .city(a.getCity())
+                                                                .state(a.getState())
+                                                                .postalCode(a.getPostalCode())
+                                                                .country(a.getCountry())
+                                                                .isDefault(a.getIsDefault())
+                                                                .createdAt(a.getCreatedAt())
+                                                                .updatedAt(a.getUpdatedAt())
+                                                                .build()).toList() : java.util.Collections.emptyList())
+                                                        .build();
                         }
 
                         @Transactional
@@ -228,14 +274,28 @@ public class CustomerService {
                                         customerRepository.save(customer);
                                 }
                                 return UserResponse.builder()
-                                                .id(customer.getId())
-                                                .email(customer.getEmail())
-                                                .fullName(customer.getFullName())
-                                                .phone(customer.getPhone())
-                                                .roles(java.util.Collections.emptySet())
-                                                .isActive(customer.getIsActive())
-                                                .createdAt(customer.getCreatedAt())
-                                                .build();
+                                                        .id(customer.getId())
+                                                        .email(customer.getEmail())
+                                                        .fullName(customer.getFullName())
+                                                        .phone(customer.getPhone())
+                                                        .roles(java.util.Collections.emptySet())
+                                                        .isActive(customer.getIsActive())
+                                                        .createdAt(customer.getCreatedAt())
+                                                        .addresses(customer.getAddresses() != null ? customer.getAddresses().stream().map(a -> AddressResponse.builder()
+                                                                .id(a.getId())
+                                                                .fullName(a.getFullName())
+                                                                .phone(a.getPhone())
+                                                                .line1(a.getLine1())
+                                                                .line2(a.getLine2())
+                                                                .city(a.getCity())
+                                                                .state(a.getState())
+                                                                .postalCode(a.getPostalCode())
+                                                                .country(a.getCountry())
+                                                                .isDefault(a.getIsDefault())
+                                                                .createdAt(a.getCreatedAt())
+                                                                .updatedAt(a.getUpdatedAt())
+                                                                .build()).toList() : java.util.Collections.emptyList())
+                                                        .build();
                         }
 }
 
