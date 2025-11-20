@@ -1,6 +1,7 @@
 package com.fashion.leon.fashionshopbackend.config;
 
 import com.fashion.leon.fashionshopbackend.repository.UserRepository;
+import com.fashion.leon.fashionshopbackend.repository.CustomerRepository;
 import com.fashion.leon.fashionshopbackend.util.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -39,6 +40,7 @@ import java.util.ArrayList;
 public class SecurityConfig {
 
     private final UserRepository userRepository;
+    private final CustomerRepository customerRepository;
     private final JwtUtil jwtUtil;
 
     @Bean
@@ -48,34 +50,47 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        // Fetch user with roles AND permissions to avoid LazyInitializationException when mapping authorities
-        return username -> userRepository.findByEmailAndIsActiveTrueFetchRolesAndPermissions(username)
-                .map(user -> {
-                    // Map roles to authorities
-                    var authorities = new ArrayList<GrantedAuthority>();
-                    if (user.getRoles() != null) {
-                        user.getRoles().forEach(role -> {
-                            authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName().toUpperCase()));
-                            // Optionally add permissions as authorities
-                            try {
-                                if (role.getPermissions() != null) {
-                                    role.getPermissions().forEach(permission ->
-                                            authorities.add(new SimpleGrantedAuthority(permission.getName()))
-                                    );
-                                }
-                            } catch (org.hibernate.LazyInitializationException ex) {
-                                // Should not happen due to fetch join; log defensively if it does.
-                                System.err.println("Warning: permissions lazy init failed for role " + role.getName());
+        // Unified lookup: first try staff/admin users (with roles), then fallback to plain customers
+        return email -> {
+            var userOpt = userRepository.findByEmailAndIsActiveTrueFetchRolesAndPermissions(email);
+            if (userOpt.isPresent()) {
+                var user = userOpt.get();
+                var authorities = new ArrayList<GrantedAuthority>();
+                if (user.getRoles() != null) {
+                    user.getRoles().forEach(role -> {
+                        authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName().toUpperCase()));
+                        try {
+                            if (role.getPermissions() != null) {
+                                role.getPermissions().forEach(permission ->
+                                        authorities.add(new SimpleGrantedAuthority(permission.getName()))
+                                );
                             }
-                        });
-                    }
-                    return org.springframework.security.core.userdetails.User.builder()
-                            .username(user.getEmail())
-                            .password(user.getPasswordHash())
-                            .authorities(authorities)
-                            .build();
-                })
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+                        } catch (org.hibernate.LazyInitializationException ex) {
+                            System.err.println("Warning: permissions lazy init failed for role " + role.getName());
+                        }
+                    });
+                }
+                return org.springframework.security.core.userdetails.User.builder()
+                        .username(user.getEmail())
+                        .password(user.getPasswordHash())
+                        .authorities(authorities)
+                        .build();
+            }
+            // Fallback to customer
+            var customerOpt = customerRepository.findByEmailAndIsActiveTrue(email);
+            if (customerOpt.isPresent()) {
+                var customer = customerOpt.get();
+                var authorities = new ArrayList<GrantedAuthority>();
+                // Give base role for authorization checks if needed
+                authorities.add(new SimpleGrantedAuthority("ROLE_CUSTOMER"));
+                return org.springframework.security.core.userdetails.User.builder()
+                        .username(customer.getEmail())
+                        .password(customer.getPasswordHash())
+                        .authorities(authorities)
+                        .build();
+            }
+            throw new UsernameNotFoundException("User not found: " + email);
+        };
     }
 
     @Bean

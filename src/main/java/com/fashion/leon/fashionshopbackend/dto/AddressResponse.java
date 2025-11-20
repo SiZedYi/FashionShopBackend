@@ -1,27 +1,27 @@
 package com.fashion.leon.fashionshopbackend.dto;
 
-import com.fashion.leon.fashionshopbackend.entity.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.Set;
-import java.util.List;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserResponse {
-    
+public class AddressResponse {
     private Long id;
-    private String email;
     private String fullName;
     private String phone;
-    private Set<String> roles;
-    private Boolean isActive;
+    private String line1;
+    private String line2;
+    private String city;
+    private String state;
+    private String postalCode;
+    private String country;
+    private Boolean isDefault;
     private LocalDateTime createdAt;
-    private List<AddressResponse> addresses;
+    private LocalDateTime updatedAt;
 }
