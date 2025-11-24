@@ -31,14 +31,34 @@ public class Order {
     @Column(name = "total_amount")
     private BigDecimal totalAmount;
 
+    private BigDecimal subtotal;
+
+    private BigDecimal tax;
+
     @Column(name = "shipping_fee")
     private BigDecimal shippingFee;
+
+    @Column(name = "coupon_code")
+    private String couponCode;
 
     @Column(name = "payment_method")
     private String paymentMethod;
 
+    @Column(name = "payment_status")
+    private String paymentStatus; // "PENDING", "PAID", "FAILED", "REFUNDED"
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "shipping_address_id")
+    private ShippingAddress shippingAddress;
+
     @Column(name = "shipping_address_snapshot")
     private String shippingAddressSnapshot;
+
+    @Column(name = "stripe_session_id")
+    private String stripeSessionId;
+
+    @Column(name = "stripe_payment_intent_id")
+    private String stripePaymentIntentId;
 
     @Column(name = "placed_at")
     private LocalDateTime placedAt;

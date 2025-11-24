@@ -24,9 +24,19 @@ public class OrderItem {
     private Product product;
 
     private Integer quantity;
+    
     @Column(name = "unit_price")
     private BigDecimal unitPrice;
+    
     @Column(name = "line_total")
     private BigDecimal lineTotal;
+    
+    private String color;
+    
+    @Column(name = "product_name")
+    private String productName;
+    
+    @Column(name = "product_image")
+    private String productImage;
 }
 
