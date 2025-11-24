@@ -256,6 +256,8 @@ public class OrderService {
                             .productId(item.getProduct().getId())
                             .productName(item.getProductName())
                             .productSku(item.getProduct().getSku())
+                            .productImage(item.getProductImage())  // Use snapshot stored in OrderItem
+                            .color(item.getColor())
                             .quantity(item.getQuantity())
                             .unitPrice(item.getUnitPrice())
                             .lineTotal(item.getLineTotal())

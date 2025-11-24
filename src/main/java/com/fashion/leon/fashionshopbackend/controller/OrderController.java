@@ -2,12 +2,17 @@ package com.fashion.leon.fashionshopbackend.controller;
 
 import com.fashion.leon.fashionshopbackend.dto.CreateOrderRequest;
 import com.fashion.leon.fashionshopbackend.dto.OrderResponse;
+import com.fashion.leon.fashionshopbackend.dto.PaginatedResponse;
 import com.fashion.leon.fashionshopbackend.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -74,16 +79,40 @@ public class OrderController {
 
     @GetMapping("/my-orders")
     @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "Get my orders", description = "Retrieve all orders for authenticated customer")
-    public ResponseEntity<List<OrderResponse>> getMyOrders(Authentication authentication) {
+    @Operation(summary = "Get my orders", description = "Retrieve all orders for authenticated customer with pagination")
+    public ResponseEntity<PaginatedResponse<OrderResponse>> getMyOrders(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "DESC") String sortDirection,
+            Authentication authentication) {
         try {
             if (authentication == null || !authentication.isAuthenticated()) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
 
             String email = authentication.getName();
-            List<OrderResponse> orders = orderService.getMyOrders(email);
-            return ResponseEntity.ok(orders);
+            
+            // Create sort object
+            Sort sort = sortDirection.equalsIgnoreCase("ASC") 
+                    ? Sort.by(sortBy).ascending() 
+                    : Sort.by(sortBy).descending();
+            
+            // Create pageable object (page is 1-indexed from request, 0-indexed for PageRequest)
+            Pageable pageable = PageRequest.of(page - 1, size, sort);
+            
+            Page<OrderResponse> orderPage = orderService.getCustomerOrders(email, pageable);
+            
+            PaginatedResponse<OrderResponse> response = new PaginatedResponse<>(
+                    page,
+                    size,
+                    orderPage.getTotalElements(),
+                    orderPage.getTotalPages(),
+                    orderPage.isLast(),
+                    orderPage.getContent()
+            );
+            
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("Error retrieving orders: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
