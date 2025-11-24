@@ -125,6 +125,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/product/**").permitAll()
                         .requestMatchers("/api/categories/**").permitAll()
                         .requestMatchers("/api/sliders/active").permitAll()
+                        .requestMatchers("/api/orders/webhook").permitAll()
+                        .requestMatchers("/api/orders/payment/success", "/api/orders/payment/cancel").permitAll()
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider())

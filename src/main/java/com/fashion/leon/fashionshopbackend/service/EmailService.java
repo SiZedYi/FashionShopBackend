@@ -1,5 +1,8 @@
 package com.fashion.leon.fashionshopbackend.service;
 
+import com.fashion.leon.fashionshopbackend.entity.Order;
+import com.fashion.leon.fashionshopbackend.entity.OrderItem;
+import com.fashion.leon.fashionshopbackend.entity.ShippingAddress;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -7,6 +10,10 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+
+import java.text.NumberFormat;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -74,5 +81,133 @@ public class EmailService {
             "Fashion Shop Team",
             resetToken
         );
+    }
+
+    /**
+     * Send order confirmation email when payment is successful
+     */
+    @Async
+    public void sendOrderConfirmationEmail(Order order) {
+        try {
+            if (order == null || order.getCustomer() == null || order.getCustomer().getEmail() == null) {
+                log.warn("Cannot send order confirmation email: order or customer email is null");
+                return;
+            }
+
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(fromEmail);
+            message.setTo(order.getCustomer().getEmail());
+            message.setSubject("Order Confirmation - " + order.getOrderNumber());
+            message.setText(buildOrderConfirmationEmailContent(order));
+
+            mailSender.send(message);
+            log.info("Order confirmation email sent successfully to: {} for order: {}", 
+                    order.getCustomer().getEmail(), order.getOrderNumber());
+        } catch (Exception e) {
+            log.error("Failed to send order confirmation email for order: {}", 
+                    order.getOrderNumber(), e);
+            // Don't throw exception to avoid breaking payment process
+        }
+    }
+
+    private String buildOrderConfirmationEmailContent(Order order) {
+        StringBuilder content = new StringBuilder();
+        NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(Locale.US);
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+        // Header
+        content.append("Dear ").append(order.getCustomer().getFullName()).append(",\n\n");
+        content.append("Thank you for your order! We're pleased to confirm that we have received your order.\n\n");
+        
+        // Order Information
+        content.append("═══════════════════════════════════════════════\n");
+        content.append("ORDER DETAILS\n");
+        content.append("═══════════════════════════════════════════════\n\n");
+        
+        content.append("Order Number: ").append(order.getOrderNumber()).append("\n");
+        content.append("Order Date: ").append(order.getPlacedAt() != null ? 
+                order.getPlacedAt().format(dateFormatter) : "N/A").append("\n");
+        content.append("Payment Method: ").append(order.getPaymentMethod()).append("\n");
+        content.append("Payment Status: ").append(order.getPaymentStatus()).append("\n");
+        
+        if (order.getPaidAt() != null) {
+            content.append("Paid At: ").append(order.getPaidAt().format(dateFormatter)).append("\n");
+        }
+        
+        content.append("\n");
+
+        // Shipping Address
+        if (order.getShippingAddress() != null) {
+            ShippingAddress addr = order.getShippingAddress();
+            content.append("SHIPPING ADDRESS:\n");
+            content.append("─────────────────────────────────────────────\n");
+            content.append(addr.getFirstName()).append(" ").append(addr.getLastName()).append("\n");
+            content.append(addr.getAddress()).append("\n");
+            content.append(addr.getCity()).append(", ").append(addr.getZip()).append("\n");
+            content.append(addr.getCountry()).append("\n");
+            content.append("Phone: ").append(addr.getPhone()).append("\n\n");
+        }
+
+        // Order Items
+        content.append("ORDER ITEMS:\n");
+        content.append("─────────────────────────────────────────────\n");
+        
+        if (order.getOrderItems() != null && !order.getOrderItems().isEmpty()) {
+            for (OrderItem item : order.getOrderItems()) {
+                content.append(String.format("• %s", item.getProductName() != null ? 
+                        item.getProductName() : "Product")).append("\n");
+                
+                if (item.getColor() != null && !item.getColor().isEmpty()) {
+                    content.append("  Color: ").append(item.getColor()).append("\n");
+                }
+                
+                content.append(String.format("  Quantity: %d x %s = %s\n",
+                        item.getQuantity(),
+                        currencyFormatter.format(item.getUnitPrice()),
+                        currencyFormatter.format(item.getLineTotal())
+                ));
+                content.append("\n");
+            }
+        }
+
+        // Order Summary
+        content.append("─────────────────────────────────────────────\n");
+        content.append("ORDER SUMMARY:\n");
+        content.append("─────────────────────────────────────────────\n");
+        
+        if (order.getSubtotal() != null) {
+            content.append(String.format("Subtotal:        %s\n", 
+                    currencyFormatter.format(order.getSubtotal())));
+        }
+        
+        if (order.getTax() != null) {
+            content.append(String.format("Tax:             %s\n", 
+                    currencyFormatter.format(order.getTax())));
+        }
+        
+        if (order.getShippingFee() != null) {
+            content.append(String.format("Shipping Fee:    %s\n", 
+                    currencyFormatter.format(order.getShippingFee())));
+        }
+        
+        if (order.getCouponCode() != null && !order.getCouponCode().isEmpty()) {
+            content.append(String.format("Coupon Code:     %s\n", order.getCouponCode()));
+        }
+        
+        content.append(String.format("\nTotal Amount:    %s\n", 
+                currencyFormatter.format(order.getTotalAmount())));
+        
+        content.append("═══════════════════════════════════════════════\n\n");
+
+        // Footer
+        content.append("We will notify you once your order has been shipped.\n\n");
+        content.append("If you have any questions about your order, please don't hesitate to contact us.\n\n");
+        content.append("Thank you for shopping with Fashion Shop!\n\n");
+        content.append("Best regards,\n");
+        content.append("Fashion Shop Team\n\n");
+        content.append("---\n");
+        content.append("This is an automated email. Please do not reply to this message.\n");
+
+        return content.toString();
     }
 }
