@@ -70,11 +70,11 @@ public class ProductController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
-        try {
-            productService.deleteProduct(id);
+        boolean deleted = productService.deleteProductWithOrderCheck(id);
+        if (deleted) {
             return ResponseEntity.ok(new ApiResponse(true, "Product deleted successfully", null));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(false, "Product deletion failed: " + e.getMessage(), null));
+        } else {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(java.util.Collections.singletonMap("error", "Không xóa được vì sản phẩm đã có đơn hàng"));
         }
     }
 // Thêm class ApiResponse để chuẩn hóa phản hồi

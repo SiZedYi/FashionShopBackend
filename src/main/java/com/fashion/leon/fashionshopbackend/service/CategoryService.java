@@ -2,12 +2,15 @@ package com.fashion.leon.fashionshopbackend.service;
 
 import com.fashion.leon.fashionshopbackend.dto.CategoryRequest;
 import com.fashion.leon.fashionshopbackend.dto.CategoryResponse;
+import com.fashion.leon.fashionshopbackend.dto.CategoryUpdateRequest;
 import com.fashion.leon.fashionshopbackend.dto.PaginatedResponse;
 import com.fashion.leon.fashionshopbackend.entity.Category;
 import com.fashion.leon.fashionshopbackend.exception.ResourceNotFoundException;
 import com.fashion.leon.fashionshopbackend.mapper.CategoryMapper;
 import com.fashion.leon.fashionshopbackend.repository.CategoryRepository;
+import com.fashion.leon.fashionshopbackend.repository.ProductCategoryRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -26,6 +29,9 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
     private final com.fashion.leon.fashionshopbackend.service.FileStorageService fileStorageService;
+
+    @Autowired
+    private ProductCategoryRepository productCategoryRepository;
 
     // Public: list only active categories
     public PaginatedResponse<CategoryResponse> listActive(Pageable pageable) {
@@ -61,24 +67,6 @@ public class CategoryService {
         return categoryMapper.toResponse(c);
     }
 
-    public CategoryResponse create(CategoryRequest req) {
-        String name = req.getName().trim();
-        String slug = normalizeSlug(req.getSlug() == null || req.getSlug().isBlank() ? name : req.getSlug());
-        if (categoryRepository.existsBySlug(slug)) {
-            throw new IllegalArgumentException("Slug already exists: " + slug);
-        }
-        Category c = Category.builder()
-                .name(name)
-                .slug(slug)
-                .description(req.getDescription())
-                .images(req.getImages())
-                .isActive(req.getIsActive() != null ? req.getIsActive() : true)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
-        return categoryMapper.toResponse(categoryRepository.save(c));
-    }
-
     // Overload: create with uploaded image; save under images/category and store path only (no host)
     public CategoryResponse create(CategoryRequest req, MultipartFile image) {
         String name = req.getName().trim();
@@ -87,7 +75,7 @@ public class CategoryService {
             throw new IllegalArgumentException("Slug already exists: " + slug);
         }
 
-        String imagePath = req.getImages();
+        String imagePath = null;
         if (image != null && !image.isEmpty()) {
             String filename = fileStorageService.save(image, "images/category");
             imagePath = "/images/category/" + filename; // store path only
@@ -105,31 +93,48 @@ public class CategoryService {
         return categoryMapper.toResponse(categoryRepository.save(c));
     }
 
-    public CategoryResponse update(Long id, CategoryRequest req) {
+    public void update(Long id, CategoryUpdateRequest req, MultipartFile image) {
         Category c = categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
-        String name = req.getName().trim();
-        c.setName(name);
-        c.setDescription(req.getDescription());
-        if (req.getImages() != null) c.setImages(req.getImages());
+        if (req.getName() != null) c.setName(req.getName().trim());
+        if (req.getDescription() != null) c.setDescription(req.getDescription());
         if (req.getIsActive() != null) c.setIsActive(req.getIsActive());
         if (req.getSlug() != null) {
-            String slug = normalizeSlug(req.getSlug().isBlank() ? name : req.getSlug());
+            String slug = normalizeSlug(req.getSlug().isBlank() ? c.getName() : req.getSlug());
             if (!slug.equalsIgnoreCase(c.getSlug()) && categoryRepository.existsBySlug(slug)) {
                 throw new IllegalArgumentException("Slug already exists: " + slug);
             }
             c.setSlug(slug);
-        } else {
-            // If slug not provided, keep existing
+        }
+        // Handle image update
+        if (image != null && !image.isEmpty()) {
+            // Delete old image if exists
+            if (c.getImages() != null && !c.getImages().isBlank()) {
+                String filename = c.getImages().substring(c.getImages().lastIndexOf("/") + 1);
+                try { fileStorageService.delete(filename, "images/category"); } catch (Exception e) { }
+            }
+            String filename = fileStorageService.save(image, "images/category");
+            // Ensure only one /images/category/ prefix
+            String imagePath = filename.startsWith("/images/category/") ? filename : "/images/category/" + filename;
+            c.setImages(imagePath);
         }
         c.setUpdatedAt(LocalDateTime.now());
-        return categoryMapper.toResponse(categoryRepository.save(c));
+        categoryRepository.save(c);
     }
 
     public void delete(Long id) {
         Category c = categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
         categoryRepository.delete(c);
+    }
+
+    public boolean deleteIfNoProducts(Long id) {
+        long count = productCategoryRepository.countByCategoryId(id);
+        if (count > 0) return false;
+        Category c = categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
+        categoryRepository.delete(c);
+        return true;
     }
 
     private static final Pattern NONLATIN = Pattern.compile("[^\u0000-\u007F]");

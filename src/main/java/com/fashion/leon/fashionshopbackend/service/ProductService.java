@@ -7,6 +7,7 @@ import com.fashion.leon.fashionshopbackend.entity.*;
 import com.fashion.leon.fashionshopbackend.exception.ResourceNotFoundException;
 import com.fashion.leon.fashionshopbackend.mapper.ProductMapper;
 import com.fashion.leon.fashionshopbackend.repository.CategoryRepository;
+import com.fashion.leon.fashionshopbackend.repository.OrderItemRepository;
 import com.fashion.leon.fashionshopbackend.repository.ProductCategoryRepository;
 import com.fashion.leon.fashionshopbackend.repository.ProductImageRepository;
 import com.fashion.leon.fashionshopbackend.repository.ProductRepository;
@@ -35,6 +36,7 @@ public class ProductService {
     private final ProductCategoryRepository productCategoryRepository;
     private final FileStorageService fileStorageService;
     private final ProductMapper productMapper;
+    private final OrderItemRepository orderItemRepository;
 
     public PaginatedResponse<ProductResponse> getAllProducts(Pageable pageable,
                                  String category,
@@ -247,5 +249,23 @@ public class ProductService {
             }
         }
         productRepository.deleteById(id);
+    }
+
+    public boolean deleteProductWithOrderCheck(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
+        long orderCount = orderItemRepository.countByProductId(id);
+        if (orderCount > 0) return false;
+        // Delete images from storage
+        for (ProductImage image : product.getProductImages()) {
+            try {
+                String filename = image.getUrl().substring(image.getUrl().lastIndexOf("/") + 1);
+                fileStorageService.delete(filename, "images/products");
+            } catch (Exception e) {
+                // Log error
+            }
+        }
+        productRepository.deleteById(id);
+        return true;
     }
 }
