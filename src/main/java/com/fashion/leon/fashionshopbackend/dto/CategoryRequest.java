@@ -15,6 +15,5 @@ public class CategoryRequest {
     private String name;
     private String slug; // optional; will be auto-generated from name if blank
     private String description;
-    private String images;
     private Boolean isActive;
 }
