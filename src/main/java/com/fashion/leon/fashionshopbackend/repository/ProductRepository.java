@@ -9,24 +9,27 @@ import org.springframework.data.repository.query.Param;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    @Query(value = "SELECT DISTINCT p FROM Product p " +
-	    "LEFT JOIN p.productCategories pc " +
-	    "LEFT JOIN pc.category c " +
-	    "WHERE (:category IS NULL OR LOWER(c.name) = LOWER(:category)) " +
-	    "AND (:color IS NULL OR (:color IS NOT NULL AND LOWER(p.color) LIKE CONCAT('%', LOWER(:color), '%'))) " +
-	    "AND (:minPrice IS NULL OR p.salePrice >= :minPrice) " +
-	    "AND (:maxPrice IS NULL OR p.salePrice <= :maxPrice)",
-	    countQuery = "SELECT COUNT(DISTINCT p) FROM Product p " +
-		    "LEFT JOIN p.productCategories pc " +
-		    "LEFT JOIN pc.category c " +
-		    "WHERE (:category IS NULL OR LOWER(c.name) = LOWER(:category)) " +
-		    "AND (:color IS NULL OR (:color IS NOT NULL AND LOWER(p.color) LIKE CONCAT('%', LOWER(:color), '%'))) " +
-		    "AND (:minPrice IS NULL OR p.salePrice >= :minPrice) " +
-		    "AND (:maxPrice IS NULL OR p.salePrice <= :maxPrice)")
-    Page<Product> searchProducts(@Param("category") String category,
+	@Query(value = "SELECT DISTINCT p FROM Product p " +
+		"LEFT JOIN p.productCategories pc " +
+		"LEFT JOIN pc.category c " +
+		"WHERE (:category IS NULL OR LOWER(c.name) = LOWER(:category)) " +
+		"AND (:color IS NULL OR (:color IS NOT NULL AND LOWER(p.color) LIKE CONCAT('%', LOWER(:color), '%'))) " +
+		"AND (:minPrice IS NULL OR p.salePrice >= :minPrice) " +
+		"AND (:maxPrice IS NULL OR p.salePrice <= :maxPrice) " +
+		"AND (:keyword IS NULL OR LOWER(p.name) LIKE CONCAT('%', LOWER(:keyword), '%'))",
+		countQuery = "SELECT COUNT(DISTINCT p) FROM Product p " +
+			"LEFT JOIN p.productCategories pc " +
+			"LEFT JOIN pc.category c " +
+			"WHERE (:category IS NULL OR LOWER(c.name) = LOWER(:category)) " +
+			"AND (:color IS NULL OR (:color IS NOT NULL AND LOWER(p.color) LIKE CONCAT('%', LOWER(:color), '%'))) " +
+			"AND (:minPrice IS NULL OR p.salePrice >= :minPrice) " +
+			"AND (:maxPrice IS NULL OR p.salePrice <= :maxPrice) " +
+			"AND (:keyword IS NULL OR LOWER(p.name) LIKE CONCAT('%', LOWER(:keyword), '%'))")
+	Page<Product> searchProducts(@Param("category") String category,
 				 @Param("color") String color,
 				 @Param("minPrice") java.math.BigDecimal minPrice,
 				 @Param("maxPrice") java.math.BigDecimal maxPrice,
+				 @Param("keyword") String keyword,
 				 Pageable pageable);
 }
 

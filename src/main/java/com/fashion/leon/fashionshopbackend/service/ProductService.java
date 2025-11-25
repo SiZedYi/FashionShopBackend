@@ -42,21 +42,23 @@ public class ProductService {
                                  String category,
                                  String color,
                                  java.math.BigDecimal minPrice,
-                                 java.math.BigDecimal maxPrice) {
-    String catFilter = (category != null && !category.isBlank()) ? category : null;
-    String colorFilter = (color != null && !color.isBlank()) ? color : null;
-    Page<Product> productPage = productRepository.searchProducts(catFilter, colorFilter, minPrice, maxPrice, pageable);
-    List<ProductResponse> data = productPage.getContent().stream()
-        .map(productMapper::toProductResponse)
-        .collect(Collectors.toList());
-    return new PaginatedResponse<>(
-        productPage.getNumber() + 1,
-        productPage.getSize(),
-        productPage.getTotalElements(),
-        productPage.getTotalPages(),
-        productPage.isLast(),
-        data
-    );
+                                 java.math.BigDecimal maxPrice,
+                                 String keyword) {
+        String catFilter = (category != null && !category.isBlank()) ? category : null;
+        String colorFilter = (color != null && !color.isBlank()) ? color : null;
+        String keywordFilter = (keyword != null && !keyword.isBlank()) ? keyword : null;
+        Page<Product> productPage = productRepository.searchProducts(catFilter, colorFilter, minPrice, maxPrice, keywordFilter, pageable);
+        List<ProductResponse> data = productPage.getContent().stream()
+            .map(productMapper::toProductResponse)
+            .collect(Collectors.toList());
+        return new PaginatedResponse<>(
+            productPage.getNumber() + 1,
+            productPage.getSize(),
+            productPage.getTotalElements(),
+            productPage.getTotalPages(),
+            productPage.isLast(),
+            data
+        );
     }
 
     public ProductResponse getProductDetail(Long id) {
