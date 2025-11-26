@@ -155,6 +155,105 @@ public class OrderService {
     }
 
     /**
+     * Get all orders for admin
+     */
+    public Page<OrderResponse> getAllOrders(Pageable pageable) {
+        Page<Order> orders = orderRepository.findAll(pageable);
+        return orders.map(this::mapToOrderResponse);
+    }
+
+    /**
+     * Get order detail for admin
+     */
+    public OrderResponse getOrderDetailForAdmin(Long orderId) {
+        Order order = orderRepository.findByIdWithItems(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + orderId));
+        return mapToOrderResponse(order);
+    }
+
+    /**
+     * Update order for admin
+     */
+    @Transactional
+    public OrderResponse updateOrder(Long orderId, UpdateOrderRequest request) {
+        Order order = orderRepository.findByIdWithItems(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + orderId));
+
+        // Update shipping address if provided
+        if (request.getShippingAddress() != null) {
+            ShippingAddressRequest addressReq = request.getShippingAddress();
+            ShippingAddress shippingAddress = order.getShippingAddress();
+            if (shippingAddress == null) {
+                shippingAddress = new ShippingAddress();
+                order.setShippingAddress(shippingAddress);
+            }
+            shippingAddress.setFirstName(addressReq.getFirstName());
+            shippingAddress.setLastName(addressReq.getLastName());
+            shippingAddress.setAddress(addressReq.getAddress());
+            shippingAddress.setCity(addressReq.getCity());
+            shippingAddress.setZip(addressReq.getZip());
+            shippingAddress.setCountry(addressReq.getCountry());
+            shippingAddress.setPhone(addressReq.getPhone());
+            order.setShippingAddressSnapshot(formatShippingAddress(addressReq));
+        }
+
+        BigDecimal newSubtotal = BigDecimal.ZERO;
+
+        // Update order items if provided
+        if (request.getItems() != null && !request.getItems().isEmpty()) {
+            for (UpdateOrderItemRequest itemReq : request.getItems()) {
+                OrderItem orderItem = order.getOrderItems().stream()
+                        .filter(oi -> oi.getId().equals(itemReq.getItemId()))
+                        .findFirst()
+                        .orElseThrow(() -> new ResourceNotFoundException("OrderItem not found with id: " + itemReq.getItemId()));
+
+                Product product = orderItem.getProduct();
+                int oldQuantity = orderItem.getQuantity();
+                int newQuantity = itemReq.getQuantity();
+
+                if (newQuantity <= 0) {
+                    // For simplicity, we don't allow removing items, just changing quantity.
+                    // To remove, one might need a separate endpoint or handle quantity 0 as deletion.
+                    throw new IllegalArgumentException("Quantity must be positive.");
+                }
+
+                int quantityChange = newQuantity - oldQuantity;
+
+                if (quantityChange > 0 && product.getStockQuantity() < quantityChange) {
+                    throw new IllegalArgumentException("Insufficient stock for product: " + product.getName());
+                }
+
+                // Adjust stock
+                product.setStockQuantity(product.getStockQuantity() - quantityChange);
+                productRepository.save(product);
+
+                // Update order item
+                orderItem.setQuantity(newQuantity);
+                orderItem.setLineTotal(orderItem.getUnitPrice().multiply(BigDecimal.valueOf(newQuantity)));
+                orderItemRepository.save(orderItem);
+            }
+        }
+
+        // Recalculate totals
+        for (OrderItem item : order.getOrderItems()) {
+            newSubtotal = newSubtotal.add(item.getLineTotal());
+        }
+
+        order.setSubtotal(newSubtotal);
+        // Assuming tax and shipping are fixed for this update logic.
+        // A more complex scenario might require recalculating these as well.
+        BigDecimal totalAmount = newSubtotal.add(order.getTax()).add(order.getShippingFee());
+        order.setTotalAmount(totalAmount);
+
+        order.setUpdatedAt(LocalDateTime.now());
+        Order updatedOrder = orderRepository.save(order);
+
+        log.info("Updated order {} by admin", updatedOrder.getOrderNumber());
+
+        return mapToOrderResponse(updatedOrder);
+    }
+
+    /**
      * Cancel order
      */
     @Transactional
@@ -189,6 +288,43 @@ public class OrderService {
         log.info("Cancelled order {} for customer {}", order.getOrderNumber(), email);
 
         return mapToOrderResponse(order);
+    }
+
+    /**
+     * Update order status for admin
+     */
+    @Transactional
+    public OrderResponse updateOrderStatus(Long orderId, String status) {
+        Order order = orderRepository.findByIdWithItems(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + orderId));
+
+        try {
+            Order.Status newStatus = Order.Status.valueOf(status.toLowerCase());
+            order.setStatus(newStatus);
+
+            // If order is refunded, restore stock
+            if (newStatus == Order.Status.refunded && "PAID".equals(order.getPaymentStatus())) {
+                if (order.getOrderItems() != null) {
+                    for (OrderItem item : order.getOrderItems()) {
+                        Product product = item.getProduct();
+                        if (product != null) {
+                            product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
+                            productRepository.save(product);
+                        }
+                    }
+                }
+                order.setPaymentStatus("REFUNDED");
+            }
+
+            order.setUpdatedAt(LocalDateTime.now());
+            orderRepository.save(order);
+
+            log.info("Updated order {} status to {}", order.getOrderNumber(), status);
+
+            return mapToOrderResponse(order);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid status value: " + status);
+        }
     }
 
     /**
