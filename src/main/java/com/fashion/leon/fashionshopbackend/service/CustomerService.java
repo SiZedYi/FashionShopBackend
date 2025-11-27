@@ -1,6 +1,7 @@
 package com.fashion.leon.fashionshopbackend.service;
 
 import com.fashion.leon.fashionshopbackend.dto.*;
+import com.fashion.leon.fashionshopbackend.entity.Address;
 import com.fashion.leon.fashionshopbackend.entity.Customer;
 import com.fashion.leon.fashionshopbackend.exception.EmailAlreadyExistsException;
 import com.fashion.leon.fashionshopbackend.exception.InvalidCredentialsException;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -297,5 +299,109 @@ public class CustomerService {
                                                                 .build()).toList() : java.util.Collections.emptyList())
                                                         .build();
                         }
+
+                        public List<UserResponse> getAllCustomers() {
+        List<Customer> customers = customerRepository.findAll();
+        return customers.stream().map(customer -> UserResponse.builder()
+                .id(customer.getId())
+                .email(customer.getEmail())
+                .fullName(customer.getFullName())
+                .phone(customer.getPhone())
+                .roles(java.util.Collections.emptySet())
+                .isActive(customer.getIsActive())
+                .createdAt(customer.getCreatedAt())
+                .addresses(customer.getAddresses() != null ? customer.getAddresses().stream().map(a -> AddressResponse.builder()
+                        .id(a.getId())
+                        .fullName(a.getFullName())
+                        .phone(a.getPhone())
+                        .line1(a.getLine1())
+                        .line2(a.getLine2())
+                        .city(a.getCity())
+                        .state(a.getState())
+                        .postalCode(a.getPostalCode())
+                        .country(a.getCountry())
+                        .isDefault(a.getIsDefault())
+                        .createdAt(a.getCreatedAt())
+                        .updatedAt(a.getUpdatedAt())
+                        .build()).toList() : java.util.Collections.emptyList())
+                .build()).toList();
+    }
+
+    public UserResponse getCustomerDetail(Long customerId) {
+        Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+        return UserResponse.builder()
+                .id(customer.getId())
+                .email(customer.getEmail())
+                .fullName(customer.getFullName())
+                .phone(customer.getPhone())
+                .roles(java.util.Collections.emptySet())
+                .isActive(customer.getIsActive())
+                .createdAt(customer.getCreatedAt())
+                .addresses(customer.getAddresses() != null ? customer.getAddresses().stream().map(a -> AddressResponse.builder()
+                        .id(a.getId())
+                        .fullName(a.getFullName())
+                        .phone(a.getPhone())
+                        .line1(a.getLine1())
+                        .line2(a.getLine2())
+                        .city(a.getCity())
+                        .state(a.getState())
+                        .postalCode(a.getPostalCode())
+                        .country(a.getCountry())
+                        .isDefault(a.getIsDefault())
+                        .createdAt(a.getCreatedAt())
+                        .updatedAt(a.getUpdatedAt())
+                        .build()).toList() : java.util.Collections.emptyList())
+                .build();
+    }
+
+    @Transactional
+    public UserResponse addAddress(String email, AddressRequest request) {
+        Customer customer = customerRepository.findByEmailAndIsActiveTrue(email)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+
+        Address address = Address.builder()
+                .customer(customer)
+                .fullName(request.getFullName())
+                .phone(request.getPhone())
+                .line1(request.getLine1())
+                .line2(request.getLine2())
+                .city(request.getCity())
+                .state(request.getState())
+                .postalCode(request.getPostalCode())
+                .country(request.getCountry())
+                .isDefault(request.getIsDefault() != null ? request.getIsDefault() : false)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+        if (customer.getAddresses() == null) {
+            customer.setAddresses(new java.util.ArrayList<>());
+        }
+        customer.getAddresses().add(address);
+        customerRepository.save(customer);
+
+        return getCustomerProfile(email);
+    }
+
+    public List<AddressResponse> getAddresses(String email) {
+        Customer customer = customerRepository.findByEmailAndIsActiveTrueFetchAddresses(email)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+        if (customer.getAddresses() == null) return java.util.Collections.emptyList();
+        return customer.getAddresses().stream().map(a -> AddressResponse.builder()
+                .id(a.getId())
+                .fullName(a.getFullName())
+                .phone(a.getPhone())
+                .line1(a.getLine1())
+                .line2(a.getLine2())
+                .city(a.getCity())
+                .state(a.getState())
+                .postalCode(a.getPostalCode())
+                .country(a.getCountry())
+                .isDefault(a.getIsDefault())
+                .createdAt(a.getCreatedAt())
+                .updatedAt(a.getUpdatedAt())
+                .build()).toList();
+    }
 }
 
