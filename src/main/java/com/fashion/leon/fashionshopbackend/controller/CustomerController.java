@@ -57,9 +57,12 @@ public class CustomerController {
 
     @GetMapping("")
     @PreAuthorize("hasAnyRole('STAFF','ADMIN','SUPERADMIN')")
-    public ResponseEntity<List<UserResponse>> getAllCustomers() {
-        List<UserResponse> customers = customerService.getAllCustomers();
-        return ResponseEntity.ok(customers);
+    public ResponseEntity<?> getAllCustomers(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String name) {
+        var paged = customerService.getAllCustomersPaged(page, size, name);
+        return ResponseEntity.ok(paged);
     }
 
     @GetMapping("/{customerId}")

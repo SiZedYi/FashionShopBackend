@@ -10,6 +10,9 @@ import com.fashion.leon.fashionshopbackend.repository.OrderRepository;
 import com.fashion.leon.fashionshopbackend.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -263,14 +266,12 @@ public class CustomerService {
                         public UserResponse adminUpdateCustomer(Long customerId, CustomerUpdateRequest request) {
                                 Customer customer = customerRepository.findById(customerId)
                                                 .orElseThrow(() -> new RuntimeException("Customer not found"));
-                                if (Boolean.FALSE.equals(customer.getIsActive())) {
-                                        throw new IllegalStateException("Customer đã bị vô hiệu hóa");
-                                }
                                 boolean changed = false;
                                 if (request.getFullName() != null) { customer.setFullName(request.getFullName()); changed = true; }
                                 if (request.getPhone() != null) { customer.setPhone(request.getPhone()); changed = true; }
                                 if (request.getPassword() != null && !request.getPassword().isBlank()) {
                                         customer.setPasswordHash(passwordEncoder.encode(request.getPassword())); changed = true; }
+                                if (request.getIsActive() != null) { customer.setIsActive(request.getIsActive()); changed = true; }
                                 if (changed) {
                                         customer.setUpdatedAt(LocalDateTime.now());
                                         customerRepository.save(customer);
@@ -402,6 +403,78 @@ public class CustomerService {
                 .createdAt(a.getCreatedAt())
                 .updatedAt(a.getUpdatedAt())
                 .build()).toList();
+    }
+
+    public PaginatedResponse<UserResponse> getAllCustomersPaged(int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<Customer> customerPage = customerRepository.findAll(pageable);
+        List<UserResponse> content = customerPage.getContent().stream().map(customer -> UserResponse.builder()
+                .id(customer.getId())
+                .email(customer.getEmail())
+                .fullName(customer.getFullName())
+                .phone(customer.getPhone())
+                .roles(java.util.Collections.emptySet())
+                .isActive(customer.getIsActive())
+                .createdAt(customer.getCreatedAt())
+                .addresses(customer.getAddresses() != null ? customer.getAddresses().stream().map(a -> AddressResponse.builder()
+                        .id(a.getId())
+                        .fullName(a.getFullName())
+                        .phone(a.getPhone())
+                        .line1(a.getLine1())
+                        .line2(a.getLine2())
+                        .city(a.getCity())
+                        .state(a.getState())
+                        .postalCode(a.getPostalCode())
+                        .country(a.getCountry())
+                        .isDefault(a.getIsDefault())
+                        .createdAt(a.getCreatedAt())
+                        .updatedAt(a.getUpdatedAt())
+                        .build()).toList() : java.util.Collections.emptyList())
+                .build()).toList();
+        return new PaginatedResponse<>(
+                page,
+                size,
+                customerPage.getTotalElements(),
+                customerPage.getTotalPages(),
+                customerPage.isLast(),
+                content
+        );
+    }
+
+    public PaginatedResponse<UserResponse> getAllCustomersPaged(int page, int size, String name) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<Customer> customerPage = customerRepository.findByFullNameContainingIgnoreCase(name, pageable);
+        List<UserResponse> content = customerPage.getContent().stream().map(customer -> UserResponse.builder()
+                .id(customer.getId())
+                .email(customer.getEmail())
+                .fullName(customer.getFullName())
+                .phone(customer.getPhone())
+                .roles(java.util.Collections.emptySet())
+                .isActive(customer.getIsActive())
+                .createdAt(customer.getCreatedAt())
+                .addresses(customer.getAddresses() != null ? customer.getAddresses().stream().map(a -> AddressResponse.builder()
+                        .id(a.getId())
+                        .fullName(a.getFullName())
+                        .phone(a.getPhone())
+                        .line1(a.getLine1())
+                        .line2(a.getLine2())
+                        .city(a.getCity())
+                        .state(a.getState())
+                        .postalCode(a.getPostalCode())
+                        .country(a.getCountry())
+                        .isDefault(a.getIsDefault())
+                        .createdAt(a.getCreatedAt())
+                        .updatedAt(a.getUpdatedAt())
+                        .build()).toList() : java.util.Collections.emptyList())
+                .build()).toList();
+        return new PaginatedResponse<>(
+                page,
+                size,
+                customerPage.getTotalElements(),
+                customerPage.getTotalPages(),
+                customerPage.isLast(),
+                content
+        );
     }
 }
 
