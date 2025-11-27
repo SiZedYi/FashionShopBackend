@@ -94,4 +94,29 @@ public class CustomerController {
         List<AddressResponse> addresses = customerService.getAddresses(email);
         return ResponseEntity.ok(addresses);
     }
+
+    @GetMapping("/address/{addressId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<AddressResponse> getAddressDetail(Authentication authentication,
+                                                            @PathVariable Long addressId) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        String email = authentication.getName();
+        AddressResponse address = customerService.getAddressDetail(email, addressId);
+        return ResponseEntity.ok(address);
+    }
+
+    @PutMapping("/address/{addressId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<AddressResponse> updateAddress(Authentication authentication,
+                                                         @PathVariable Long addressId,
+                                                         @Valid @RequestBody AddressRequest request) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        String email = authentication.getName();
+        AddressResponse res = customerService.updateAddress(email, addressId, request);
+        return ResponseEntity.ok(res);
+    }
 }

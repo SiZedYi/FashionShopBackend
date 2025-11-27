@@ -11,6 +11,7 @@ import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
 @Component
@@ -60,6 +61,16 @@ public class JwtUtil {
     public String generateToken(String username) {
         Map<String, Object> claims = new HashMap<>();
         return createToken(claims, username);
+    }
+
+    public String generateToken(String email, String fullName, String phone, Set<String> roles, Set<String> permissions) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("email", email);
+        claims.put("fullName", fullName);
+        claims.put("phone", phone);
+        claims.put("roles", roles);
+        claims.put("permissions", permissions);
+        return createToken(claims, email);
     }
 
     private String createToken(Map<String, Object> claims, String subject) {

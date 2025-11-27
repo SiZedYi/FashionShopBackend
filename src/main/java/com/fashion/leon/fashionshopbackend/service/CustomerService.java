@@ -5,6 +5,7 @@ import com.fashion.leon.fashionshopbackend.entity.Address;
 import com.fashion.leon.fashionshopbackend.entity.Customer;
 import com.fashion.leon.fashionshopbackend.exception.EmailAlreadyExistsException;
 import com.fashion.leon.fashionshopbackend.exception.InvalidCredentialsException;
+import com.fashion.leon.fashionshopbackend.repository.AddressRepository;
 import com.fashion.leon.fashionshopbackend.repository.CustomerRepository;
 import com.fashion.leon.fashionshopbackend.repository.OrderRepository;
 import com.fashion.leon.fashionshopbackend.util.JwtUtil;
@@ -31,7 +32,8 @@ public class CustomerService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final EmailService emailService;
-        private final NotifyService notifyService;
+    private final NotifyService notifyService;
+    private final AddressRepository addressRepository;
 
     @Transactional
     public AuthResponse registerCustomer(RegisterRequest request) {
@@ -57,8 +59,14 @@ public class CustomerService {
         Customer savedCustomer = customerRepository.save(customer);
         log.info("Customer registered successfully with ID: {}", savedCustomer.getId());
 
-        // Generate JWT token
-        String token = jwtUtil.generateToken(savedCustomer.getEmail());
+        // Generate JWT token with customer info (no roles/permissions for customers)
+        String token = jwtUtil.generateToken(
+                savedCustomer.getEmail(),
+                savedCustomer.getFullName(),
+                savedCustomer.getPhone(),
+                Collections.emptySet(),
+                Collections.emptySet()
+        );
 
         // Create user response
         UserResponse userResponse = UserResponse.builder()
@@ -143,8 +151,14 @@ public class CustomerService {
                         .build()).toList() : java.util.Collections.emptyList())
                 .build();
 
-        // Generate JWT token
-        String token = jwtUtil.generateToken(customer.getEmail());
+        // Generate JWT token with customer info (no roles/permissions for customers)
+        String token = jwtUtil.generateToken(
+                customer.getEmail(),
+                customer.getFullName(),
+                customer.getPhone(),
+                Collections.emptySet(),
+                Collections.emptySet()
+        );
 
         return AuthResponse.builder()
                 .token(token)
@@ -361,6 +375,20 @@ public class CustomerService {
         Customer customer = customerRepository.findByEmailAndIsActiveTrue(email)
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
 
+        boolean setAsDefault = request.getIsDefault() != null ? request.getIsDefault() : false;
+
+        // If setting as default, remove default from other addresses
+        if (setAsDefault) {
+            List<Address> customerAddresses = addressRepository.findByCustomerId(customer.getId());
+            for (Address addr : customerAddresses) {
+                if (Boolean.TRUE.equals(addr.getIsDefault())) {
+                    addr.setIsDefault(false);
+                    addr.setUpdatedAt(LocalDateTime.now());
+                    addressRepository.save(addr);
+                }
+            }
+        }
+
         Address address = Address.builder()
                 .customer(customer)
                 .fullName(request.getFullName())
@@ -371,7 +399,7 @@ public class CustomerService {
                 .state(request.getState())
                 .postalCode(request.getPostalCode())
                 .country(request.getCountry())
-                .isDefault(request.getIsDefault() != null ? request.getIsDefault() : false)
+                .isDefault(setAsDefault)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
@@ -403,6 +431,89 @@ public class CustomerService {
                 .createdAt(a.getCreatedAt())
                 .updatedAt(a.getUpdatedAt())
                 .build()).toList();
+    }
+
+    public AddressResponse getAddressDetail(String email, Long addressId) {
+        Customer customer = customerRepository.findByEmailAndIsActiveTrue(email)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+
+        Address address = addressRepository.findById(addressId)
+                .orElseThrow(() -> new RuntimeException("Address not found"));
+
+        // Verify address belongs to customer
+        if (!address.getCustomer().getId().equals(customer.getId())) {
+            throw new IllegalArgumentException("Address does not belong to customer");
+        }
+
+        return AddressResponse.builder()
+                .id(address.getId())
+                .fullName(address.getFullName())
+                .phone(address.getPhone())
+                .line1(address.getLine1())
+                .line2(address.getLine2())
+                .city(address.getCity())
+                .state(address.getState())
+                .postalCode(address.getPostalCode())
+                .country(address.getCountry())
+                .isDefault(address.getIsDefault())
+                .createdAt(address.getCreatedAt())
+                .updatedAt(address.getUpdatedAt())
+                .build();
+    }
+
+    @Transactional
+    public AddressResponse updateAddress(String email, Long addressId, AddressRequest request) {
+        Customer customer = customerRepository.findByEmailAndIsActiveTrue(email)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+
+        Address address = addressRepository.findById(addressId)
+                .orElseThrow(() -> new RuntimeException("Address not found"));
+
+        // Verify address belongs to customer
+        if (!address.getCustomer().getId().equals(customer.getId())) {
+            throw new IllegalArgumentException("Address does not belong to customer");
+        }
+
+        // If setting as default, remove default from other addresses
+        if (request.getIsDefault() != null && request.getIsDefault()) {
+            List<Address> customerAddresses = addressRepository.findByCustomerId(customer.getId());
+            for (Address addr : customerAddresses) {
+                if (!addr.getId().equals(addressId) && Boolean.TRUE.equals(addr.getIsDefault())) {
+                    addr.setIsDefault(false);
+                    addr.setUpdatedAt(LocalDateTime.now());
+                    addressRepository.save(addr);
+                }
+            }
+        }
+
+        // Update address fields
+        if (request.getFullName() != null) address.setFullName(request.getFullName());
+        if (request.getPhone() != null) address.setPhone(request.getPhone());
+        if (request.getLine1() != null) address.setLine1(request.getLine1());
+        address.setLine2(request.getLine2());
+        if (request.getCity() != null) address.setCity(request.getCity());
+        address.setState(request.getState());
+        if (request.getPostalCode() != null) address.setPostalCode(request.getPostalCode());
+        if (request.getCountry() != null) address.setCountry(request.getCountry());
+        if (request.getIsDefault() != null) address.setIsDefault(request.getIsDefault());
+        address.setUpdatedAt(LocalDateTime.now());
+
+        Address updatedAddress = addressRepository.save(address);
+
+        return AddressResponse.builder()
+                .id(updatedAddress.getId())
+                .fullName(updatedAddress.getFullName())
+                .phone(updatedAddress.getPhone())
+                .line1(updatedAddress.getLine1())
+                .line2(updatedAddress.getLine2())
+                .city(updatedAddress.getCity())
+                .state(updatedAddress.getState())
+                .postalCode(updatedAddress.getPostalCode())
+                .country(updatedAddress.getCountry())
+                .isDefault(updatedAddress.getIsDefault())
+                .createdAt(updatedAddress.getCreatedAt())
+                .updatedAt(updatedAddress.getUpdatedAt())
+                .build();
     }
 
     public PaginatedResponse<UserResponse> getAllCustomersPaged(int page, int size) {

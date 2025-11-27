@@ -79,8 +79,21 @@ public class UserService {
         User savedUser = userRepository.save(user);
         log.info("Admin user registered successfully with ID: {}", savedUser.getId());
 
-        // Generate JWT token
-        String token = jwtUtil.generateToken(savedUser.getEmail());
+        // Collect role names and permissions
+        Set<String> roleNames = savedUser.getRoles().stream().map(Role::getName).collect(Collectors.toSet());
+        Set<String> permissionNames = savedUser.getRoles().stream()
+                .flatMap(role -> role.getPermissions() != null ? role.getPermissions().stream() : java.util.stream.Stream.empty())
+                .map(com.fashion.leon.fashionshopbackend.entity.Permission::getName)
+                .collect(Collectors.toSet());
+
+        // Generate JWT token with full user info (excluding id and password)
+        String token = jwtUtil.generateToken(
+                savedUser.getEmail(),
+                savedUser.getFullName(),
+                savedUser.getPhone(),
+                roleNames,
+                permissionNames
+        );
 
         // Create user response
         UserResponse userResponse = UserResponse.builder()
@@ -88,7 +101,7 @@ public class UserService {
                 .email(savedUser.getEmail())
                 .fullName(savedUser.getFullName())
                 .phone(savedUser.getPhone())
-                .roles(savedUser.getRoles().stream().map(Role::getName).collect(Collectors.toSet()))
+                .roles(roleNames)
                 .isActive(savedUser.getIsActive())
                 .createdAt(savedUser.getCreatedAt())
                 .build();
@@ -140,6 +153,7 @@ public class UserService {
 
         // Handle empty or null roles collection
         Set<String> roleNames;
+        Set<String> permissionNames = new HashSet<>();
         if (user.getRoles() == null || user.getRoles().isEmpty()) {
             log.warn("User {} has no roles assigned!", user.getEmail());
             roleNames = new HashSet<>();
@@ -147,8 +161,15 @@ public class UserService {
             roleNames = user.getRoles().stream()
                     .map(Role::getName)
                     .collect(Collectors.toSet());
+            
+            // Collect all permissions from all roles
+            permissionNames = user.getRoles().stream()
+                    .flatMap(role -> role.getPermissions() != null ? role.getPermissions().stream() : java.util.stream.Stream.empty())
+                    .map(com.fashion.leon.fashionshopbackend.entity.Permission::getName)
+                    .collect(Collectors.toSet());
         }
         log.info("Roles: {}", roleNames);
+        log.info("Permissions: {}", permissionNames);
 
         // Create user response
         UserResponse userResponse = UserResponse.builder()
@@ -161,8 +182,14 @@ public class UserService {
                 .createdAt(user.getCreatedAt())
                 .build();
 
-        // Generate JWT token
-        String token = jwtUtil.generateToken(user.getEmail());
+        // Generate JWT token with full user info (excluding id and password)
+        String token = jwtUtil.generateToken(
+                user.getEmail(),
+                user.getFullName(),
+                user.getPhone(),
+                roleNames,
+                permissionNames
+        );
 
         return AuthResponse.builder()
                 .token(token)
