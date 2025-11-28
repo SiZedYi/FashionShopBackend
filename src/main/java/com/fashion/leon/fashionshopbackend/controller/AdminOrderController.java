@@ -49,7 +49,8 @@ public class AdminOrderController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
-            @RequestParam(defaultValue = "DESC") String sortDirection) {
+            @RequestParam(defaultValue = "DESC") String sortDirection,
+            @RequestParam(name = "search", required = false) String search) {
         try {
             Sort sort = sortDirection.equalsIgnoreCase("ASC")
                     ? Sort.by(sortBy).ascending()
@@ -57,7 +58,7 @@ public class AdminOrderController {
 
             Pageable pageable = PageRequest.of(page - 1, size, sort);
 
-            Page<OrderResponse> orderPage = orderService.getAllOrders(pageable);
+            Page<OrderResponse> orderPage = orderService.getAllOrders(pageable, search);
 
             PaginatedResponse<OrderResponse> response = new PaginatedResponse<>(
                     page,

@@ -155,10 +155,34 @@ public class OrderService {
     }
 
     /**
-     * Get all orders for admin
+     * Get all orders for admin with optional search by orderNumber, id, or status
      */
-    public Page<OrderResponse> getAllOrders(Pageable pageable) {
-        Page<Order> orders = orderRepository.findAll(pageable);
+    public Page<OrderResponse> getAllOrders(Pageable pageable, String search) {
+        Page<Order> orders;
+
+        if (search == null || search.trim().isEmpty()) {
+            orders = orderRepository.findAll(pageable);
+        } else {
+            String q = search.trim();
+
+            // Try parse numeric id
+            Long id = null;
+            try {
+                id = Long.parseLong(q);
+            } catch (NumberFormatException ignored) {}
+
+            // Try parse status enum (case-insensitive)
+            Order.Status status = null;
+            for (Order.Status s : Order.Status.values()) {
+                if (s.name().equalsIgnoreCase(q)) {
+                    status = s;
+                    break;
+                }
+            }
+
+            orders = orderRepository.searchOrders(id, q, status, pageable);
+        }
+
         return orders.map(this::mapToOrderResponse);
     }
 
