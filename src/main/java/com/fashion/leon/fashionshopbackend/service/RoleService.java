@@ -24,19 +24,30 @@ public class RoleService {
     private final RoleRepository roleRepository;
     private final PermissionRepository permissionRepository;
 
-    public PaginatedResponse<RoleResponse> list(Pageable pageable) {
-        Page<Role> page = roleRepository.findAll(pageable);
+    public PaginatedResponse<RoleResponse> list(Pageable pageable, String search) {
+        Page<Role> page;
+        if (search == null || search.trim().isEmpty()) {
+            page = roleRepository.findAll(pageable);
+        } else {
+            page = roleRepository.searchRoles(search.trim(), pageable);
+        }
         List<RoleResponse> data = page.getContent().stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
-    return new PaginatedResponse<>(
-        page.getNumber() + 1,
+        return new PaginatedResponse<>(
+                page.getNumber() + 1,
                 page.getSize(),
                 page.getTotalElements(),
                 page.getTotalPages(),
                 page.isLast(),
                 data
         );
+    }
+
+    public List<RoleResponse> getAll() {
+        return roleRepository.findAll().stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
     }
 
     public RoleResponse get(Long id) {
@@ -91,6 +102,12 @@ public class RoleService {
     public void delete(Long id) {
         Role role = roleRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Role not found with id: " + id));
+        
+        // Check if role is assigned to any users
+        if (role.getUsers() != null && !role.getUsers().isEmpty()) {
+            throw new IllegalStateException("Cannot delete role that is assigned to users. Remove role from users first.");
+        }
+        
         roleRepository.delete(role);
     }
 

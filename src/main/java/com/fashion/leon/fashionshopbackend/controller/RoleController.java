@@ -24,10 +24,16 @@ public class RoleController {
     @GetMapping
     public PaginatedResponse<RoleResponse> list(
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "20") int size
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String search
     ) {
         Pageable pageable = PageRequest.of(Math.max(0, page - 1), size);
-        return roleService.list(pageable);
+        return roleService.list(pageable, search);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<java.util.List<RoleResponse>> getAll() {
+        return ResponseEntity.ok(roleService.getAll());
     }
 
     @GetMapping("/{id}")

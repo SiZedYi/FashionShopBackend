@@ -24,10 +24,16 @@ public class PermissionController {
     @GetMapping
     public PaginatedResponse<PermissionResponse> list(
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "20") int size
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String search
     ) {
         Pageable pageable = PageRequest.of(Math.max(0, page - 1), size);
-        return permissionService.list(pageable);
+        return permissionService.list(pageable, search);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<java.util.List<PermissionResponse>> getAll() {
+        return ResponseEntity.ok(permissionService.getAll());
     }
 
     @GetMapping("/{id}")

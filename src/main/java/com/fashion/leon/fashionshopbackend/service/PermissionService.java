@@ -19,19 +19,30 @@ import java.util.stream.Collectors;
 public class PermissionService {
     private final PermissionRepository permissionRepository;
 
-    public PaginatedResponse<PermissionResponse> list(Pageable pageable) {
-        Page<Permission> page = permissionRepository.findAll(pageable);
+    public PaginatedResponse<PermissionResponse> list(Pageable pageable, String search) {
+        Page<Permission> page;
+        if (search == null || search.trim().isEmpty()) {
+            page = permissionRepository.findAll(pageable);
+        } else {
+            page = permissionRepository.searchPermissions(search.trim(), pageable);
+        }
         List<PermissionResponse> data = page.getContent().stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
-    return new PaginatedResponse<>(
-        page.getNumber() + 1,
+        return new PaginatedResponse<>(
+                page.getNumber() + 1,
                 page.getSize(),
                 page.getTotalElements(),
                 page.getTotalPages(),
                 page.isLast(),
                 data
         );
+    }
+
+    public List<PermissionResponse> getAll() {
+        return permissionRepository.findAll().stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
     }
 
     public PermissionResponse get(Long id) {
@@ -69,6 +80,12 @@ public class PermissionService {
     public void delete(Long id) {
         Permission p = permissionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Permission not found with id: " + id));
+        
+        // Check if permission is used in any roles
+        if (p.getRoles() != null && !p.getRoles().isEmpty()) {
+            throw new IllegalStateException("Cannot delete permission that is assigned to roles. Remove it from roles first.");
+        }
+        
         permissionRepository.delete(p);
     }
 
