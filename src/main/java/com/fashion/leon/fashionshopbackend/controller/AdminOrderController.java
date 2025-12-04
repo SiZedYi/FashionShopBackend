@@ -30,7 +30,7 @@ public class AdminOrderController {
     private final OrderService orderService;
 
     @GetMapping("/{orderId}")
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN', 'STAFF', 'MANAGER')")
     @Operation(summary = "Get order by ID for admin", description = "Retrieve order details by ID for admins")
     public ResponseEntity<OrderResponse> getOrderById(@PathVariable Long orderId) {
         try {
@@ -43,7 +43,7 @@ public class AdminOrderController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN', 'STAFF', 'MANAGER')")
     @Operation(summary = "Get all orders", description = "Retrieve all orders with pagination for admins")
     public ResponseEntity<PaginatedResponse<OrderResponse>> getAllOrders(
             @RequestParam(defaultValue = "1") int page,
@@ -95,7 +95,7 @@ public class AdminOrderController {
     }
 
     @PutMapping("/{orderId}/status")
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN', 'STAFF', 'MANAGER')")
     @Operation(summary = "Update order status", description = "Update the status of an existing order")
     public ResponseEntity<OrderResponse> updateOrderStatus(
             @PathVariable Long orderId,

@@ -48,7 +48,7 @@ public class CustomerController {
     }
 
     @PutMapping("/{customerId}")
-    @PreAuthorize("hasAnyRole('STAFF','ADMIN','SUPERADMIN')")
+    @PreAuthorize("hasAnyRole('STAFF','ADMIN','SUPERADMIN','MANAGER')")
     public ResponseEntity<UserResponse> adminUpdateCustomer(@PathVariable Long customerId,
                                                             @Valid @RequestBody CustomerUpdateRequest request) {
         UserResponse res = customerService.adminUpdateCustomer(customerId, request);
@@ -56,7 +56,7 @@ public class CustomerController {
     }
 
     @GetMapping("")
-    @PreAuthorize("hasAnyRole('STAFF','ADMIN','SUPERADMIN')")
+    @PreAuthorize("hasAnyRole('STAFF','ADMIN','SUPERADMIN','MANAGER')")
     public ResponseEntity<?> getAllCustomers(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -66,7 +66,7 @@ public class CustomerController {
     }
 
     @GetMapping("/{customerId}")
-    @PreAuthorize("hasAnyRole('STAFF','ADMIN','SUPERADMIN')")
+    @PreAuthorize("hasAnyRole('STAFF','ADMIN','SUPERADMIN','MANAGER')")
     public ResponseEntity<UserResponse> getCustomerDetail(@PathVariable Long customerId) {
         UserResponse customer = customerService.getCustomerDetail(customerId);
         return ResponseEntity.ok(customer);

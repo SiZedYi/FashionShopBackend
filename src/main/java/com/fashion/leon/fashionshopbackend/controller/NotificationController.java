@@ -23,7 +23,7 @@ public class NotificationController {
     private final NotificationRepository notificationRepository;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('STAFF','ADMIN','SUPERADMIN')")
+    @PreAuthorize("hasAnyRole('STAFF','ADMIN','SUPERADMIN','MANAGER')")
     public ResponseEntity<Page<NotificationResponse>> list(@RequestParam(defaultValue = "1") int page,
                                                            @RequestParam(defaultValue = "20") int size) {
         Pageable pageable = PageRequest.of(Math.max(0, page), Math.min(Math.max(1, size), 100));
@@ -35,7 +35,7 @@ public class NotificationController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('STAFF','ADMIN','SUPERADMIN')")
+    @PreAuthorize("hasAnyRole('STAFF','ADMIN','SUPERADMIN','MANAGER')")
     public ResponseEntity<NotificationResponse> getById(@PathVariable Long id) {
         return notificationRepository.findById(id)
                 .map(n -> ResponseEntity.ok(toDto(n)))

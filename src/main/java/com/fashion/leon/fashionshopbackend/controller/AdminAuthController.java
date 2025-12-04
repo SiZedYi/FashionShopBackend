@@ -88,6 +88,14 @@ public class AdminAuthController {
         return ResponseEntity.ok(result);
     }
 
+    @GetMapping("/users/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','SUPERADMIN')")
+    public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
+        log.info("[ADMIN] Get user detail by id: {}", id);
+        UserResponse user = userService.getUserById(id);
+        return ResponseEntity.ok(user);
+    }
+
     // Delete a specific customer by id if they have never placed an order
     @DeleteMapping("/customers/{customerId}")
     @PreAuthorize("hasAnyRole('ADMIN','SUPERADMIN')")

@@ -325,6 +325,14 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
+    public UserResponse getUserById(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User không tồn tại với id: " + userId));
+        log.info("Fetching user details for id: {}", userId);
+        return toUserResponse(user);
+    }
+
+    @Transactional(readOnly = true)
     public com.fashion.leon.fashionshopbackend.dto.PaginatedResponse<UserResponse> listUsers(String q, Boolean isActive, String role, int page, int size) {
     Pageable pageable = PageRequest.of(Math.max(page - 1, 0), Math.min(Math.max(size, 1), 100));
         Page<User> users = userRepository.searchUsers(

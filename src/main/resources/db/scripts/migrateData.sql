@@ -9,14 +9,14 @@ VALUES
 INSERT INTO users (email, password_hash, full_name, phone, is_active, created_at, updated_at)
 VALUES
 ('admin@fashionshop.com', '$2a$10$FqEzFFY9eXNrGDQoKynTBOHF5L85FmTtMvovEPoWtA7dPEuNbFh7K', 'Admin User', '1112223333', 1, NOW(), NOW()),
-('staff@fashionshop.com', '$2a$10$staffHashExample', 'Staff User', '2223334444', 1, NOW(), NOW());
+('staff@fashionshop.com', '$2a$10$FqEzFFY9eXNrGDQoKynTBOHF5L85FmTtMvovEPoWtA7dPEuNbFh7K', 'Staff User', '2223334444', 1, NOW(), NOW());
 
 
-INSERT INTO roles (name, description) VALUES
-('superadmin', 'Super Administrator role with all permissions'),
-('admin', 'Administrator role'),
-('staff', 'Staff member role'),
-('manager', 'Manager role');
+# INSERT INTO roles (name, description) VALUES
+# ('superadmin', 'Super Administrator role with all permissions'),
+# ('admin', 'Administrator role'),
+# ('staff', 'Staff member role'),
+# ('manager', 'Manager role');
 
 
 INSERT INTO permissions (name, description) VALUES
@@ -72,8 +72,15 @@ INSERT INTO permissions (name, description) VALUES
 
 
 -- Assign all permissions to superadmin
-INSERT INTO role_permissions (role_id, permission_id)
-SELECT 1, id FROM permissions;
+INSERT INTO role_permissions (role_id, permission_id) VALUES
+(1, (SELECT id FROM permissions WHERE name = 'MANAGE_PRODUCTS')),
+(1, (SELECT id FROM permissions WHERE name = 'MANAGE_ORDERS')),
+(1, (SELECT id FROM permissions WHERE name = 'MANAGE_CUSTOMERS')),
+(1, (SELECT id FROM permissions WHERE name = 'MANAGE_CATEGORIES')),
+(1, (SELECT id FROM permissions WHERE name = 'MANAGE_USERS')),
+(1, (SELECT id FROM permissions WHERE name = 'MANAGE_REPORTS')),
+(1, (SELECT id FROM permissions WHERE name = 'MANAGE_ROLES')),
+(1, (SELECT id FROM permissions WHERE name = 'MANAGE_PERMISSIONS'));
 
 -- Assign typical permissions to admin
 INSERT INTO role_permissions (role_id, permission_id) VALUES
@@ -126,9 +133,9 @@ ALTER TABLE categories ADD COLUMN IF NOT EXISTS images VARCHAR(1000) NULL;
 -- SLIDERS
 INSERT INTO sliders (image_url, subtitle, title, button_text, button_link, text_align, is_active, display_order, created_at, updated_at)
 VALUES
-('images/slider/slider-1.jpg', 'PRODUCTS', 'The beauty of nature is hidden in details.', 'Shop Now', '/shop', 'center', 1, 1, NOW(), NOW()),
-('images/slider/slider-2.jpg', 'NEW COLLECTION', 'Discover Your Style With Our Latest Fashion', 'Explore Now', '/shop', 'center', 1, 2, NOW(), NOW()),
-('images/slider/slider-3.jpg', 'SUMMER SALE', 'Up to 50% Off on Selected Items', 'Shop Sale', '/shop?sale=true', 'center', 1, 3, NOW(), NOW());
+('/images/slider/slider-1.jpg', 'PRODUCTS', 'The beauty of nature is hidden in details.', 'Shop Now', '/shop', 'center', 1, 1, NOW(), NOW()),
+('/images/slider/slider-2.jpg', 'NEW COLLECTION', 'Discover Your Style With Our Latest Fashion', 'Explore Now', '/shop', 'center', 1, 2, NOW(), NOW()),
+('/images/slider/slider-3.jpg', 'SUMMER SALE', 'Up to 50% Off on Selected Items', 'Shop Sale', '/shop?sale=true', 'center', 1, 3, NOW(), NOW());
 
 -- PRODUCTS
 INSERT INTO products (sku, name, description, price, sale_price, stock_quantity, is_active, created_at, updated_at, about_item, discount, rating, brand, color)

@@ -20,7 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/admin/categories")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
-@PreAuthorize("hasAnyRole('ADMIN','SUPERADMIN')")
+@PreAuthorize("hasAnyRole('ADMIN','SUPERADMIN', 'MANAGER')")
 public class AdminCategoryController {
     private final CategoryService categoryService;
 
