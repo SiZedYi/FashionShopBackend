@@ -1,0 +1,303 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36 Edg/142.0.0.0" version="29.2.4">
+  <diagram name="Page-1" id="B4WuMZ3YwaTSGKDNQyVE">
+    <mxGraphModel dx="2302" dy="1269" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="02PkrocIvurLiIKVvjT7-661" parent="1" style="whiteSpace=wrap;strokeWidth=2;" value="Hệ thống Fashion Shop" vertex="1">
+          <mxGeometry height="232" width="3483" x="20" y="179" as="geometry" />
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-662" parent="1" style="ellipse;aspect=fixed;strokeWidth=2;whiteSpace=wrap;" value="Khách hàng" vertex="1">
+          <mxGeometry height="97" width="97" x="890" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-663" parent="1" style="ellipse;aspect=fixed;strokeWidth=2;whiteSpace=wrap;" value="Quản trị viên" vertex="1">
+          <mxGeometry height="109" width="109" x="2602" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-664" parent="1" style="rounded=1;arcSize=20;strokeWidth=2" value="Đăng ký tài khoản" vertex="1">
+          <mxGeometry height="54" width="158" x="55" y="204" as="geometry" />
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-665" parent="1" style="rounded=1;arcSize=20;strokeWidth=2" value="Đăng nhập" vertex="1">
+          <mxGeometry height="54" width="106" x="575" y="332" as="geometry" />
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-666" parent="1" style="rounded=1;arcSize=20;strokeWidth=2" value="Quản lý tài khoản cá nhân" vertex="1">
+          <mxGeometry height="54" width="219" x="283" y="204" as="geometry" />
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-667" parent="1" style="rounded=1;arcSize=20;strokeWidth=2" value="Xem sản phẩm" vertex="1">
+          <mxGeometry height="54" width="136" x="988" y="204" as="geometry" />
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-668" parent="1" style="rounded=1;arcSize=20;strokeWidth=2" value="Tìm kiếm sản phẩm" vertex="1">
+          <mxGeometry height="54" width="172" x="1797" y="204" as="geometry" />
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-669" parent="1" style="rounded=1;arcSize=20;strokeWidth=2" value="Xem chi tiết sản phẩm" vertex="1">
+          <mxGeometry height="54" width="194" x="1329" y="332" as="geometry" />
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-670" parent="1" style="rounded=1;arcSize=20;strokeWidth=2" value="Quản lý giỏ hàng" vertex="1">
+          <mxGeometry height="54" width="151" x="552" y="204" as="geometry" />
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-671" parent="1" style="rounded=1;arcSize=20;strokeWidth=2" value="Đặt hàng" vertex="1">
+          <mxGeometry height="54" width="95" x="1237" y="204" as="geometry" />
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-672" parent="1" style="rounded=1;arcSize=20;strokeWidth=2" value="Thanh toán" vertex="1">
+          <mxGeometry height="54" width="111" x="1572" y="332" as="geometry" />
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-673" parent="1" style="rounded=1;arcSize=20;strokeWidth=2" value="Xem lịch sử đơn hàng" vertex="1">
+          <mxGeometry height="54" width="184" x="753" y="204" as="geometry" />
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-674" parent="1" style="rounded=1;arcSize=20;strokeWidth=2" value="Xem danh mục" vertex="1">
+          <mxGeometry height="54" width="137" x="1381" y="204" as="geometry" />
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-675" parent="1" style="rounded=1;arcSize=20;strokeWidth=2" value="Xem slider trang chủ" vertex="1">
+          <mxGeometry height="54" width="180" x="1568" y="204" as="geometry" />
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-676" parent="1" style="rounded=1;arcSize=20;strokeWidth=2" value="Đăng nhập quản trị" vertex="1">
+          <mxGeometry height="54" width="168" x="2573" y="332" as="geometry" />
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-677" parent="1" style="rounded=1;arcSize=20;strokeWidth=2" value="Quản lý sản phẩm" vertex="1">
+          <mxGeometry height="54" width="160" x="2051" y="204" as="geometry" />
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-678" parent="1" style="rounded=1;arcSize=20;strokeWidth=2" value="Quản lý danh mục" vertex="1">
+          <mxGeometry height="54" width="161" x="2261" y="204" as="geometry" />
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-679" parent="1" style="rounded=1;arcSize=20;strokeWidth=2" value="Quản lý đơn hàng" vertex="1">
+          <mxGeometry height="54" width="156" x="2472" y="204" as="geometry" />
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-680" parent="1" style="rounded=1;arcSize=20;strokeWidth=2" value="Quản lý khách hàng" vertex="1">
+          <mxGeometry height="54" width="171" x="2679" y="204" as="geometry" />
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-681" parent="1" style="rounded=1;arcSize=20;strokeWidth=2" value="Quản lý slider" vertex="1">
+          <mxGeometry height="54" width="130" x="2900" y="204" as="geometry" />
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-682" parent="1" style="rounded=1;arcSize=20;strokeWidth=2" value="Quản lý vai trò &amp; quyền" vertex="1">
+          <mxGeometry height="54" width="202" x="3079" y="204" as="geometry" />
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-683" parent="1" style="rounded=1;arcSize=20;strokeWidth=2" value="Xem thông báo" vertex="1">
+          <mxGeometry height="54" width="137" x="3331" y="204" as="geometry" />
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-684" edge="1" parent="1" source="02PkrocIvurLiIKVvjT7-662" style="curved=1;startArrow=none;endArrow=none;exitX=0;exitY=0.55;entryX=0.5;entryY=0.01;rounded=0;" target="02PkrocIvurLiIKVvjT7-664" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="134" y="154" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-685" edge="1" parent="1" source="02PkrocIvurLiIKVvjT7-662" style="curved=1;startArrow=none;endArrow=none;exitX=0;exitY=0.56;entryX=0;entryY=0.34;rounded=0;" target="02PkrocIvurLiIKVvjT7-665" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="248" y="154" />
+              <mxPoint x="248" y="295" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-686" edge="1" parent="1" source="02PkrocIvurLiIKVvjT7-662" style="curved=1;startArrow=none;endArrow=none;exitX=0;exitY=0.57;entryX=0.5;entryY=0.01;rounded=0;" target="02PkrocIvurLiIKVvjT7-666" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="393" y="154" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-687" edge="1" parent="1" source="02PkrocIvurLiIKVvjT7-662" style="curved=1;startArrow=none;endArrow=none;exitX=0.99;exitY=0.84;entryX=0.5;entryY=0.01;rounded=0;" target="02PkrocIvurLiIKVvjT7-667" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1056" y="154" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-688" edge="1" parent="1" source="02PkrocIvurLiIKVvjT7-662" style="curved=1;startArrow=none;endArrow=none;exitX=0.99;exitY=0.54;entryX=0.5;entryY=0.01;rounded=0;" target="02PkrocIvurLiIKVvjT7-668" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1884" y="154" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-689" edge="1" parent="1" source="02PkrocIvurLiIKVvjT7-662" style="curved=1;startArrow=none;endArrow=none;exitX=0;exitY=0.63;entryX=0.5;entryY=0.01;rounded=0;" target="02PkrocIvurLiIKVvjT7-670" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="628" y="154" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-690" edge="1" parent="1" source="02PkrocIvurLiIKVvjT7-662" style="curved=1;startArrow=none;endArrow=none;exitX=0.99;exitY=0.62;entryX=0.49;entryY=0.01;rounded=0;" target="02PkrocIvurLiIKVvjT7-671" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1284" y="154" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-691" edge="1" parent="1" source="02PkrocIvurLiIKVvjT7-662" style="curved=1;startArrow=none;endArrow=none;exitX=0;exitY=0.93;entryX=0.5;entryY=0.01;rounded=0;" target="02PkrocIvurLiIKVvjT7-673" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="846" y="154" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-692" edge="1" parent="1" source="02PkrocIvurLiIKVvjT7-662" style="curved=1;startArrow=none;endArrow=none;exitX=0.99;exitY=0.58;entryX=0.5;entryY=0.01;rounded=0;" target="02PkrocIvurLiIKVvjT7-674" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1449" y="154" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-693" edge="1" parent="1" source="02PkrocIvurLiIKVvjT7-662" style="curved=1;startArrow=none;endArrow=none;exitX=0.99;exitY=0.56;entryX=0.5;entryY=0.01;rounded=0;" target="02PkrocIvurLiIKVvjT7-675" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1658" y="154" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-694" edge="1" parent="1" source="02PkrocIvurLiIKVvjT7-663" style="curved=1;startArrow=none;endArrow=none;exitX=0;exitY=0.56;entryX=0;entryY=0.35;rounded=0;" target="02PkrocIvurLiIKVvjT7-676" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2016" y="154" />
+              <mxPoint x="2016" y="295" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-695" edge="1" parent="1" source="02PkrocIvurLiIKVvjT7-663" style="curved=1;startArrow=none;endArrow=none;exitX=0;exitY=0.58;entryX=0.5;entryY=0.01;rounded=0;" target="02PkrocIvurLiIKVvjT7-677" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2131" y="154" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-696" edge="1" parent="1" source="02PkrocIvurLiIKVvjT7-663" style="curved=1;startArrow=none;endArrow=none;exitX=0;exitY=0.63;entryX=0.5;entryY=0.01;rounded=0;" target="02PkrocIvurLiIKVvjT7-678" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2342" y="154" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-697" edge="1" parent="1" source="02PkrocIvurLiIKVvjT7-663" style="curved=1;startArrow=none;endArrow=none;exitX=0;exitY=0.88;entryX=0.5;entryY=0.01;rounded=0;" target="02PkrocIvurLiIKVvjT7-679" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2551" y="154" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-698" edge="1" parent="1" source="02PkrocIvurLiIKVvjT7-663" style="curved=1;startArrow=none;endArrow=none;exitX=1;exitY=0.87;entryX=0.5;entryY=0.01;rounded=0;" target="02PkrocIvurLiIKVvjT7-680" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2764" y="154" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-699" edge="1" parent="1" source="02PkrocIvurLiIKVvjT7-663" style="curved=1;startArrow=none;endArrow=none;exitX=1;exitY=0.63;entryX=0.5;entryY=0.01;rounded=0;" target="02PkrocIvurLiIKVvjT7-681" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2964" y="154" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-700" edge="1" parent="1" source="02PkrocIvurLiIKVvjT7-663" style="curved=1;startArrow=none;endArrow=none;exitX=1;exitY=0.58;entryX=0.5;entryY=0.01;rounded=0;" target="02PkrocIvurLiIKVvjT7-682" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="3180" y="154" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-701" edge="1" parent="1" source="02PkrocIvurLiIKVvjT7-663" style="curved=1;startArrow=none;endArrow=none;exitX=1;exitY=0.56;entryX=0.5;entryY=0.01;rounded=0;" target="02PkrocIvurLiIKVvjT7-683" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="3399" y="154" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-702" edge="1" parent="1" source="02PkrocIvurLiIKVvjT7-667" style="curved=1;dashed=1;dashPattern=2 3;startArrow=none;endArrow=block;exitX=0.99;exitY=1.01;entryX=0.04;entryY=0.01;rounded=0;" target="02PkrocIvurLiIKVvjT7-669" value="«include»">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1215" y="295" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-703" edge="1" parent="1" source="02PkrocIvurLiIKVvjT7-668" style="curved=1;dashed=1;dashPattern=2 3;startArrow=none;endArrow=block;exitX=0;exitY=0.76;entryX=0.62;entryY=0.01;rounded=0;" target="02PkrocIvurLiIKVvjT7-669" value="«include»">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1482" y="295" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-704" edge="1" parent="1" source="02PkrocIvurLiIKVvjT7-671" style="curved=1;dashed=1;dashPattern=2 3;startArrow=none;endArrow=block;exitX=0.99;exitY=0.67;entryX=0.5;entryY=0.01;rounded=0;" target="02PkrocIvurLiIKVvjT7-672" value="«include»">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1628" y="295" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-705" edge="1" parent="1" source="02PkrocIvurLiIKVvjT7-666" style="curved=1;dashed=1;dashPattern=2 3;startArrow=none;endArrow=block;exitX=0.5;exitY=1.01;entryX=0;entryY=0.24;rounded=0;" target="02PkrocIvurLiIKVvjT7-665" value="«include»">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="393" y="295" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-706" edge="1" parent="1" source="02PkrocIvurLiIKVvjT7-670" style="curved=1;dashed=1;dashPattern=2 3;startArrow=none;endArrow=block;exitX=0.5;exitY=1.01;entryX=0.5;entryY=0.01;rounded=0;" target="02PkrocIvurLiIKVvjT7-665" value="«include»">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-707" edge="1" parent="1" source="02PkrocIvurLiIKVvjT7-671" style="curved=1;dashed=1;dashPattern=2 3;startArrow=none;endArrow=block;exitX=0;exitY=0.69;entryX=1;entryY=0.33;rounded=0;" target="02PkrocIvurLiIKVvjT7-665" value="«include»">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="976" y="295" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-708" edge="1" parent="1" source="02PkrocIvurLiIKVvjT7-673" style="curved=1;dashed=1;dashPattern=2 3;startArrow=none;endArrow=block;exitX=1;exitY=1;entryX=1;entryY=0.36;rounded=0;" target="02PkrocIvurLiIKVvjT7-665" value="«include»">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1065" y="295" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-709" edge="1" parent="1" source="02PkrocIvurLiIKVvjT7-677" style="curved=1;dashed=1;dashPattern=2 3;startArrow=none;endArrow=block;exitX=0.5;exitY=1.01;entryX=0;entryY=0.32;rounded=0;" target="02PkrocIvurLiIKVvjT7-676" value="«include»">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2131" y="295" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-710" edge="1" parent="1" source="02PkrocIvurLiIKVvjT7-678" style="curved=1;dashed=1;dashPattern=2 3;startArrow=none;endArrow=block;exitX=0.5;exitY=1.01;entryX=0;entryY=0.19;rounded=0;" target="02PkrocIvurLiIKVvjT7-676" value="«include»">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2342" y="295" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-711" edge="1" parent="1" source="02PkrocIvurLiIKVvjT7-679" style="curved=1;dashed=1;dashPattern=2 3;startArrow=none;endArrow=block;exitX=0.5;exitY=1.01;entryX=0.23;entryY=0.01;rounded=0;" target="02PkrocIvurLiIKVvjT7-676" value="«include»">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2551" y="295" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-712" edge="1" parent="1" source="02PkrocIvurLiIKVvjT7-680" style="curved=1;dashed=1;dashPattern=2 3;startArrow=none;endArrow=block;exitX=0.5;exitY=1.01;entryX=0.77;entryY=0.01;rounded=0;" target="02PkrocIvurLiIKVvjT7-676" value="«include»">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2764" y="295" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-713" edge="1" parent="1" source="02PkrocIvurLiIKVvjT7-681" style="curved=1;dashed=1;dashPattern=2 3;startArrow=none;endArrow=block;exitX=0.5;exitY=1.01;entryX=1;entryY=0.18;rounded=0;" target="02PkrocIvurLiIKVvjT7-676" value="«include»">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2964" y="295" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-714" edge="1" parent="1" source="02PkrocIvurLiIKVvjT7-682" style="curved=1;dashed=1;dashPattern=2 3;startArrow=none;endArrow=block;exitX=0.5;exitY=1.01;entryX=1;entryY=0.32;rounded=0;" target="02PkrocIvurLiIKVvjT7-676" value="«include»">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="3180" y="295" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="02PkrocIvurLiIKVvjT7-715" edge="1" parent="1" source="02PkrocIvurLiIKVvjT7-683" style="curved=1;dashed=1;dashPattern=2 3;startArrow=none;endArrow=block;exitX=0.5;exitY=1.01;entryX=1;entryY=0.37;rounded=0;" target="02PkrocIvurLiIKVvjT7-676" value="«include»">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="3399" y="295" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
