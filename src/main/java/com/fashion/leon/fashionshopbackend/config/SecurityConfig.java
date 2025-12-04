@@ -123,6 +123,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/login").permitAll()
                         .requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/test", "/api/auth/test-email").permitAll()
                         .requestMatchers("/api/product/**").permitAll()
+                        .requestMatchers("/api/search/**").permitAll()
                         .requestMatchers("/api/categories/**").permitAll()
                         .requestMatchers("/api/sliders/active").permitAll()
                         .requestMatchers("/api/orders/webhook").permitAll()

@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -43,6 +44,7 @@ public class SliderController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyAuthority('MANAGE_SLIDERS', 'WRITE_SLIDERS')")
     public ResponseEntity<SliderResponse> createSlider(@Valid @RequestBody SliderRequest request) {
         log.info("POST /api/sliders - Creating new slider");
         SliderResponse slider = sliderService.createSlider(request);
@@ -50,6 +52,7 @@ public class SliderController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('MANAGE_SLIDERS', 'WRITE_SLIDERS')")
     public ResponseEntity<SliderResponse> updateSlider(
             @PathVariable Long id,
             @Valid @RequestBody SliderRequest request) {
@@ -59,6 +62,7 @@ public class SliderController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('MANAGE_SLIDERS', 'DELETE_SLIDERS')")
     public ResponseEntity<Void> deleteSlider(@PathVariable Long id) {
         log.info("DELETE /api/sliders/{} - Deleting slider", id);
         sliderService.deleteSlider(id);

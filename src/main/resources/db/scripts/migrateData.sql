@@ -11,47 +11,100 @@ VALUES
 ('admin@fashionshop.com', '$2a$10$FqEzFFY9eXNrGDQoKynTBOHF5L85FmTtMvovEPoWtA7dPEuNbFh7K', 'Admin User', '1112223333', 1, NOW(), NOW()),
 ('staff@fashionshop.com', '$2a$10$staffHashExample', 'Staff User', '2223334444', 1, NOW(), NOW());
 
--- ROLES
-# INSERT INTO roles (name, description) VALUES
-# ('superadmin', 'Super Administrator role with all permissions'),
-# ('admin', 'Administrator role'),
-# ('staff', 'Staff member role'),
-# ('manager', 'Manager role');
 
--- PERMISSIONS
+INSERT INTO roles (name, description) VALUES
+('superadmin', 'Super Administrator role with all permissions'),
+('admin', 'Administrator role'),
+('staff', 'Staff member role'),
+('manager', 'Manager role');
+
+
 INSERT INTO permissions (name, description) VALUES
+-- Product
+('WRITE_PRODUCTS', 'Create & Update products'),
 ('READ_PRODUCTS', 'View products'),
-('WRITE_PRODUCTS', 'Add or edit products'),
 ('DELETE_PRODUCTS', 'Delete products'),
-('MANAGE_USERS', 'Manage users'),
-('MANAGE_ORDERS', 'Manage orders'),
-('VIEW_REPORTS', 'View reports'),
-('MANAGE_CATEGORIES', 'Manage product categories'),
-('MANAGE_SLIDERS', 'Manage homepage sliders'),
-('MANAGE_PRODUCTS', 'Manage all product details'),
-('READ_USERS', 'View users'),
-('WRITE_USERS', 'Add or edit users'),
-('DELETE_USERS', 'Delete users'),
+('MANAGE_PRODUCTS', 'Full access to products'),
+-- Order
 ('READ_ORDERS', 'View orders'),
-('WRITE_ORDERS', 'Add or edit orders'),
-('DELETE_ORDERS', 'Delete orders')
+('UPDATE_ORDERS', 'Update order status'),
+('CANCEL_ORDERS', 'Cancel orders'),
+('MANAGE_ORDERS', 'Full access to orders'),
+-- Customer
+('READ_CUSTOMERS', 'View customers'),
+('WRITE_CUSTOMERS', 'Create & Update customers'),
+('DELETE_CUSTOMERS', 'Delete customers'),
+('MANAGE_CUSTOMERS', 'Full access to customers'),
+-- Category
+('READ_CATEGORIES', 'View categories'),
+('WRITE_CATEGORIES', 'Create & Update categories'),
+('DELETE_CATEGORIES', 'Delete categories'),
+('MANAGE_CATEGORIES', 'Full access to categories'),
+-- Blog
+('READ_BLOGS', 'View blogs'),
+('WRITE_BLOGS', 'Create & Update blogs'),
+('DELETE_BLOGS', 'Delete blogs'),
+('MANAGE_BLOGS', 'Full access to blogs'),
+-- Slider
+('READ_SLIDERS', 'View sliders'),
+('WRITE_SLIDERS', 'Create & Update sliders'),
+('DELETE_SLIDERS', 'Delete sliders'),
+('MANAGE_SLIDERS', 'Full access to sliders'),
+-- Role & Permission
+('READ_ROLES', 'View roles'),
+('WRITE_ROLES', 'Create & Update roles'),
+('DELETE_ROLES', 'Delete roles'),
+('MANAGE_ROLES', 'Full access to roles'),
+('READ_PERMISSIONS', 'View permissions'),
+('WRITE_PERMISSIONS', 'Create & Update permissions'),
+('DELETE_PERMISSIONS', 'Delete permissions'),
+('MANAGE_PERMISSIONS', 'Full access to permissions'),
+-- Admin User
+('READ_USERS', 'View admin users'),
+('WRITE_USERS', 'Create & Update admin users'),
+('DELETE_USERS', 'Delete admin users'),
+('MANAGE_USERS', 'Full access to admin users'),
+-- Report/Analytics
+('VIEW_REPORTS', 'Access analytics and reports'),
+('VIEW_STATISTICS', 'View dashboard statistics'),
+('MANAGE_REPORTS', 'Full access to reports & analytics')
 ;
 
--- ROLE_PERMISSIONS
+
+-- Assign all permissions to superadmin
+INSERT INTO role_permissions (role_id, permission_id)
+SELECT 1, id FROM permissions;
+
+-- Assign typical permissions to admin
 INSERT INTO role_permissions (role_id, permission_id) VALUES
-(1, 1), -- admin: READ_PRODUCTS
-(1, 2), -- admin: WRITE_PRODUCTS
-(1, 3), -- admin: DELETE_PRODUCTS
-(1, 4), -- admin: MANAGE_USERS
-(1, 5), -- admin: MANAGE_ORDERS
-(1, 6), -- admin: VIEW_REPORTS
-(2, 1), -- staff: READ_PRODUCTS
-(2, 2), -- staff: WRITE_PRODUCTS
-(2, 5), -- staff: MANAGE_ORDERS
-(3, 1), -- manager: READ_PRODUCTS
-(3, 2), -- manager: WRITE_PRODUCTS
-(3, 5), -- manager: MANAGE_ORDERS
-(3, 6); -- manager: VIEW_REPORTS
+(2, (SELECT id FROM permissions WHERE name = 'MANAGE_PRODUCTS')),
+(2, (SELECT id FROM permissions WHERE name = 'MANAGE_ORDERS')),
+(2, (SELECT id FROM permissions WHERE name = 'MANAGE_CUSTOMERS')),
+(2, (SELECT id FROM permissions WHERE name = 'MANAGE_CATEGORIES')),
+(2, (SELECT id FROM permissions WHERE name = 'MANAGE_USERS')),
+(2, (SELECT id FROM permissions WHERE name = 'MANAGE_REPORTS')),
+(2, (SELECT id FROM permissions WHERE name = 'MANAGE_ROLES')),
+(2, (SELECT id FROM permissions WHERE name = 'MANAGE_PERMISSIONS'));
+
+-- Staff: mostly read/write
+INSERT INTO role_permissions (role_id, permission_id) VALUES
+(3, (SELECT id FROM permissions WHERE name = 'READ_PRODUCTS')),
+(3, (SELECT id FROM permissions WHERE name = 'WRITE_PRODUCTS')),
+(3, (SELECT id FROM permissions WHERE name = 'READ_ORDERS')),
+(3, (SELECT id FROM permissions WHERE name = 'UPDATE_ORDERS')),
+(3, (SELECT id FROM permissions WHERE name = 'READ_CUSTOMERS')),
+(3, (SELECT id FROM permissions WHERE name = 'READ_CATEGORIES')),
+(3, (SELECT id FROM permissions WHERE name = 'READ_USERS')),
+(3, (SELECT id FROM permissions WHERE name = 'VIEW_REPORTS'));
+
+-- Manager: read and manage reports
+INSERT INTO role_permissions (role_id, permission_id) VALUES
+(4, (SELECT id FROM permissions WHERE name = 'READ_PRODUCTS')),
+(4, (SELECT id FROM permissions WHERE name = 'READ_ORDERS')),
+(4, (SELECT id FROM permissions WHERE name = 'READ_CUSTOMERS')),
+(4, (SELECT id FROM permissions WHERE name = 'READ_CATEGORIES')),
+(4, (SELECT id FROM permissions WHERE name = 'VIEW_REPORTS')),
+(4, (SELECT id FROM permissions WHERE name = 'MANAGE_REPORTS'));
 
 -- USER_ROLES
 INSERT INTO user_roles (user_id, role_id) VALUES
