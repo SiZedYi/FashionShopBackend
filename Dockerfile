@@ -5,6 +5,7 @@ COPY pom.xml .
 COPY .mvn .mvn
 RUN mvn dependency:go-offline
 COPY src src
+COPY images images
 RUN mvn clean install -DskipTests
 
 # Stage 2: Create the final image with JRE 21
