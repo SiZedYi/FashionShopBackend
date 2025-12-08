@@ -63,10 +63,24 @@ public class AdminCategoryController {
     @PutMapping(value = "/{id}", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<?> updateCategory(
             @PathVariable Long id,
-            @RequestPart("data") CategoryUpdateRequest request,
+            @RequestPart("data") String data,
             @RequestPart(value = "image", required = false) MultipartFile image) {
-        categoryService.update(id, request, image);
-        return ResponseEntity.ok().build();
+        try {
+            com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            CategoryUpdateRequest request = objectMapper.readValue(data, CategoryUpdateRequest.class);
+            // Validate manually
+            java.util.List<String> errors = new java.util.ArrayList<>();
+            if (request.getName() == null || request.getName().trim().isEmpty()) {
+                errors.add("Category name is required");
+            }
+            if (!errors.isEmpty()) {
+                return ResponseEntity.badRequest().body(java.util.Collections.singletonMap("name", errors.get(0)));
+            }
+            categoryService.update(id, request, image);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(java.util.Collections.singletonMap("error", "Invalid category data"));
+        }
     }
 
     @DeleteMapping("/{id}")
