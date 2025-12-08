@@ -1,12 +1,58 @@
 services:
-  redis:
-    image: 'redis:latest'
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fashionshop-backend
     ports:
-      - '6379'
-  maria-db:
-    image: 'mariadb:latest'
+      - "8000:8000"
     environment:
-      MYSQL_ROOT_PASSWORD: anhthang123
-      MARIADB_DATABASE: fashion_shop
+      - SPRING_DATASOURCE_URL=jdbc:mariadb://db:3306/fashion_shop
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=anhthang123
+      - JWT_SECRET=R2lkZ2xldC1qd3QtU2VjcmV0LUtleS1oZWFsdGh5LXNlY3VyZS1rZXk=
+      - FRONTEND_URL=http://frontend:3000
+    depends_on:
+      - db
+    networks:
+      - fashion-shop-network
+
+  # frontend:
+  #   build:
+  #     context: ../FashionShopFrontend
+  #     dockerfile: Dockerfile
+  #   container_name: fashionshop-frontend
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - NEXT_PUBLIC_API_URL=http://backend:8000/api
+  #     - NEXT_PUBLIC_IMAGE_URL=http://backend:8000
+  #     - NEXT_PUBLIC_API_HOSTNAME=backend
+  #     - NEXT_PUBLIC_API_PORT=8000
+  #     - NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_51SWtY6HXJR6UR0Lieml9wkyRrvvCmf1dI8yf3d5TskmYfEugrddVjmEPbo1KAjf9Octy8DiGYRLRJ2qGtHPTmiVN00AWbLQrzC
+  #   depends_on:
+  #     - backend
+  #   networks:
+  #     - fashion-shop-network
+
+  db:
+    image: mariadb:latest
+    container_name: mariadb
+    environment:
+      - MARIADB_ROOT_PASSWORD=anhthang123
+      - MARIADB_DATABASE=fashion_shop
     ports:
-      - '3344:3306'
+      - "3398:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      - ./src/main/resources/db/scripts/migrateData.sql:/docker-entrypoint-initdb.d/migrateData.sql
+    networks:
+      - fashion-shop-network
+
+volumes:
+  mariadb_data:
+
+networks:
+  fashion-shop-network:
+    driver: bridge
+
