@@ -13,5 +13,7 @@ FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 # Copy the built JAR from the builder stage
 COPY --from=builder /app/target/*.jar app.jar
+COPY --from=builder /app/images ./images
+
 EXPOSE 8000
 ENTRYPOINT ["java", "-jar", "app.jar"]
